@@ -21,6 +21,7 @@ const VideoCard = ({
   // const [channelInfo, setChannelInfo] = useState({ name: "", avatar: "" });
   // VideoCard.jsx ke andar formatDuration function ko is se badal dein:
   const formatDuration = (val) => {
+    if (val === "LIVE" || val === "REC") return val;
     // Agar value string hai toh number mein convert karein
     const seconds = parseInt(val, 10);
 
@@ -40,8 +41,12 @@ const VideoCard = ({
           src={video.thumbnailUrl}
           alt={video.title}
           className="video-thumbnail"
+          // Agar URL kharab ho ya image na milay toh placeholder dikhao
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/live_placeholder.png";
+          }}
         />
-
         <div
           style={{
             position: "absolute",
@@ -51,10 +56,10 @@ const VideoCard = ({
             gap: "5px",
           }}
         >
-          {video.category === "Live" ? (
+          {video.duration === "LIVE" ? (
             <span
               style={{
-                backgroundColor: "rgba(255,0,0,0.8)",
+                backgroundColor: "rgba(255,0,0,0.8)", // Red for Live
                 color: "white",
                 padding: "2px 6px",
                 borderRadius: "4px",
@@ -65,26 +70,23 @@ const VideoCard = ({
                 gap: "3px",
               }}
             >
-              <Circle size={6} fill="white" /> LIVE
+              <Circle size={6} fill="white" className="pulse" /> LIVE
             </span>
           ) : (
             <span
               style={{
-                position: "absolute",
-                bottom: "8px",
-                right: "8px",
-                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                backgroundColor: "rgba(0, 0, 0, 0.8)", // Black for REC and normal videos
                 color: "white",
                 padding: "2px 6px",
                 borderRadius: "4px",
                 fontSize: "11px",
                 display: "flex",
                 alignItems: "center",
-                gap: "4px", // Icon aur text ke darmiyan fasla
+                gap: "4px",
               }}
             >
-              <Clock size={12} /> {/* Chota clock icon */}
-              {formatDuration(video.duration) || "00:00"}
+              <Clock size={12} />
+              {formatDuration(video.duration)}
             </span>
           )}
         </div>

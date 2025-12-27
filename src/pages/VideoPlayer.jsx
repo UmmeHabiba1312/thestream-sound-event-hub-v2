@@ -429,24 +429,24 @@ const VideoPlayer = () => {
   };
 
   // Auto-sync Live → Archive
-  useEffect(() => {
-    if (!video || video.category !== "Live" || !video.stream_id) return;
+  // useEffect(() => {
+  //   if (!video || video.category !== "Live" || !video.stream_id) return;
 
-    let interval;
+  //   let interval;
 
-    const autoSync = async () => {
-      if (isSyncing) return; // prevent multiple fetches
-      await fetchRecording(video.stream_id);
-    };
+  //   const autoSync = async () => {
+  //     if (isSyncing) return; // prevent multiple fetches
+  //     await fetchRecording(video.stream_id);
+  //   };
 
-    // Check every 10s
-    interval = setInterval(autoSync, 10000);
+  //   // Check every 10s
+  //   interval = setInterval(autoSync, 10000);
 
-    return () => clearInterval(interval); // cleanup
-  }, [video, isSyncing]);
+  //   return () => clearInterval(interval); // cleanup
+  // }, [video, isSyncing]);
 
   // ==========================================
-  // 2. MAIN PLAYER LOGIC
+  // 2. MAIN PLAYER LOGIC (REPLACED VERSION)
   // ==========================================
   useEffect(() => {
     if (!video || !videoRef.current) return;
@@ -456,29 +456,44 @@ const VideoPlayer = () => {
       hlsInstance.current.destroy();
     }
 
-    // --- YE FUNCTION DEFINE KIYA HAI ---
     const setupPlayer = async () => {
-      let videoSrc = "";
-      const isLive =
-        video.stream_status === "live" || video.stream_status === "active";
-      const isFinished = video.stream_status === "finished";
+      let videoSrc = video.video_url || "";
 
-      if (isLive) {
-        videoSrc = `https://livepeercdn.studio/hls/${video.video_url}/index.m3u8`;
-      } else if (isFinished) {
-        videoSrc = `https://livepeercdn.studio/asset/${video.video_url}/video`;
-      } else {
-        videoSrc = video.videoUrl;
+      const isActuallyLive =
+        video.stream_status === "live" || video.stream_status === "active";
+      const isLiveCategory =
+        video.category === "Live" || video.category === "Archive";
+
+      // 1. ✅ URL Construction (Har type ke liye alag rasta)
+      if (!videoSrc.includes("https://")) {
+        if (isActuallyLive) {
+          // Case A: Stream abhi live hai
+          videoSrc = `https://livepeercdn.studio/hls/${video.video_url}/index.m3u8`;
+        } else if (isLiveCategory) {
+          // Case B: Recorded video hai (Catalyst Raw Path Fix)
+          videoSrc = `https://vod-cdn.lp-playback.studio/raw/jxf4iblf6wlsyor6526t4tcmtmqa/catalyst-vod-com/hls/${video.video_url}/index.m3u8`;
+        } else {
+          // Case C: Normal Uploaded Video (Supabase MP4)
+          videoSrc = supabase.storage
+            .from("video")
+            .getPublicUrl(video.video_url).data.publicUrl;
+        }
       }
 
-      console.log("Final Attempting URL:", videoSrc);
+      console.log("Final Playing Source:", videoSrc);
 
-      if (Hls.isSupported() && (isLive || isFinished)) {
+      // 2. ✅ Player Logic (M3U8 vs MP4)
+      const isM3U8 = videoSrc.includes(".m3u8");
+
+      if (isM3U8 && Hls.isSupported()) {
+        // 🔴 LIVE/RECORDED (HLS.js use karein)
+        if (hlsInstance.current) hlsInstance.current.destroy();
+
         const hls = new Hls({
-          manifestLoadingMaxRetry: 10,
           xhrSetup: (xhr) => {
             xhr.withCredentials = false;
           },
+          enableWorker: true,
         });
 
         hlsInstance.current = hls;
@@ -486,27 +501,26 @@ const VideoPlayer = () => {
         hls.attachMedia(videoRef.current);
 
         hls.on(Hls.Events.ERROR, (event, data) => {
-          if (data.fatal && data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-            const fallback = `https://livepeercdn.studio/hls/${video.video_url}/index.m3u8`;
-            if (hls.url !== fallback) {
-              console.warn("Trying fallback...");
-              hls.loadSource(fallback);
-            }
-          }
+          if (data.fatal) console.error("HLS Fatal Error:", data.type);
         });
       } else {
-        // Fallback for native HLS (Safari) or normal videos
-        videoEl.src = videoSrc;
+        // 📹 NORMAL MP4 (Direct Play)
+        if (hlsInstance.current) {
+          hlsInstance.current.destroy();
+          hlsInstance.current = null;
+        }
+        videoRef.current.src = videoSrc;
+        // Poster (Thumbnail) load karein normal video ke liye
+        if (video.thumbUrl) videoRef.current.poster = video.thumbUrl;
       }
     };
 
-    // ✅ SABSE IMPORTANT LINE: Isay call karna lazmi hai!
     setupPlayer();
 
     return () => {
       if (hlsInstance.current) hlsInstance.current.destroy();
     };
-  }, [video]);
+  }, [video]); // Jab bhi video state badlegi ye dobara chalega
 
   // Load User
   useEffect(() => {
@@ -573,14 +587,23 @@ const VideoPlayer = () => {
           vUrl = supabase.storage.from("video").getPublicUrl(vid.video_url)
             .data.publicUrl;
         }
+
         let tUrl = "/default-thumbnail.jpg";
-        if (vid.thumbnail_url) {
-          tUrl = vid.thumbnail_url.startsWith("http")
-            ? vid.thumbnail_url
-            : supabase.storage
-                .from("thumbnails")
-                .getPublicUrl(vid.thumbnail_url).data.publicUrl;
+
+        if (vid.thumbnail_url && vid.thumbnail_url.startsWith("http")) {
+          tUrl = vid.thumbnail_url;
+        } else if (vUrl.includes("https://")) {
+          // ✅ Agar DB mein poora recording link hai, toh usay use karo
+          tUrl = vUrl.replace("index.m3u8", "thumbnails/default.jpg");
+        } else if (
+          vid.stream_status === "live" ||
+          vid.stream_status === "active"
+        ) {
+          tUrl = `https://playback.livepeer.studio/hls/${vid.video_url}/thumbnails/default.jpg`;
+        } else {
+          tUrl = `https://playback.livepeer.studio/hls/${vid.video_url}/thumbnails/default.jpg`;
         }
+
         setVideo({ ...vid, videoUrl: vUrl, thumbUrl: tUrl });
 
         const { data: ch } = await supabase

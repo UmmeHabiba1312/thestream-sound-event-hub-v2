@@ -1,260 +1,351 @@
 .subscription-page {
-  min-height: 100vh;
-  padding: 3rem 1.5rem;
-  background: linear-gradient(180deg, #141414 0%, #0a0a0a 100%);
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    background: linear-gradient(180deg, #141414 0%, #0a0a0a 100%);
 }
 
 .subscription-header {
-  text-align: center;
-  margin-bottom: 4rem;
-  animation: fade-in 0.8s ease-out;
+    text-align: center;
+    margin-bottom: 4rem;
+    animation: fade-in 0.8s ease-out;
 }
 
 .subscription-title {
-  font-size: 3rem;
-  font-weight: bold;
-  color: var(--foreground);
-  margin-bottom: 1rem;
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--foreground);
+    margin-bottom: 1rem;
 }
 
 .subscription-subtitle {
-  font-size: 1.25rem;
-  color: var(--muted-foreground);
+    font-size: 1.25rem;
+    color: var(--muted-foreground);
 }
 
 .plans-container {
-  max-width: 80rem;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  margin-bottom: 5rem;
+    max-width: 80rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-bottom: 5rem;
 }
 
 .plan-card {
-  position: relative;
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: var(--shadow-card);
-  transition: var(--transition-smooth);
-  animation: slide-in-up 0.6s ease-out forwards;
-  opacity: 0;
+    position: relative;
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-smooth);
+    animation: slide-in-up 0.6s ease-out forwards;
+    opacity: 0;
 }
 
 .plan-card:nth-child(1) {
-  animation-delay: 0.1s;
+    animation-delay: 0.1s;
 }
 
 .plan-card:nth-child(2) {
-  animation-delay: 0.2s;
+    animation-delay: 0.2s;
 }
 
 .plan-card:nth-child(3) {
-  animation-delay: 0.3s;
+    animation-delay: 0.3s;
 }
 
 .plan-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-glow);
-  border-color: var(--primary);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-glow);
+    border-color: var(--primary);
 }
 
 .plan-card.popular {
-  border: 2px solid var(--primary);
-  box-shadow: var(--shadow-premium);
-  transform: scale(1.05);
+    border: 2px solid var(--primary);
+    box-shadow: var(--shadow-premium);
+    transform: scale(1.05);
 }
 
 .plan-card.popular:hover {
-  transform: scale(1.05) translateY(-8px);
+    transform: scale(1.05) translateY(-8px);
 }
 
 .popular-badge {
-  position: absolute;
-  top: -1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: bold;
-  color: white;
-  background: linear-gradient(135deg, #dc2626, #f87171);
-  box-shadow: var(--shadow-glow);
+    position: absolute;
+    top: -1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #dc2626, #f87171);
+    box-shadow: var(--shadow-glow);
 }
 
 .plan-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--border);
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
 }
 
 .plan-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--foreground);
-  margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--foreground);
+    margin-bottom: 1rem;
 }
 
 .plan-price {
-  margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .price-amount {
-  font-size: 3rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #dc2626, #f87171);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+    font-size: 3rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #dc2626, #f87171);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .price-period {
-  color: var(--muted-foreground);
-  margin-left: 0.5rem;
+    color: var(--muted-foreground);
+    margin-left: 0.5rem;
 }
 
 .plan-uploads {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--primary);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--primary);
 }
 
 .plan-features {
-  margin-bottom: 2rem;
+    margin-bottom: 2rem;
+    padding: 0px;
 }
 
 .plan-features > * + * {
-  margin-top: 1rem;
+    margin-top: 1rem;
 }
 
 .feature-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  color: var(--foreground);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    color: var(--foreground);
 }
 
 .check-icon {
-  color: var(--primary);
-  flex-shrink: 0;
-  margin-top: 0.125rem;
+    color: var(--primary);
+    flex-shrink: 0;
+    margin-top: 0.125rem;
 }
 
 .plan-button {
-  width: 100%;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  color: white;
-  background: linear-gradient(135deg, #292929 0%, #2e2e2e 100%);
-  transition: var(--transition-smooth);
-  border: none;
-  cursor: pointer;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #292929 0%, #2e2e2e 100%);
+    transition: var(--transition-smooth);
+    border: none;
+    cursor: pointer;
 }
 
 .plan-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
 }
 
 .plan-button.premium {
-  background: linear-gradient(135deg, #dc2626, #f87171);
-  box-shadow: var(--shadow-premium);
+    background: linear-gradient(135deg, #dc2626, #f87171);
+    box-shadow: var(--shadow-premium);
 }
 
 .plan-button.premium:hover {
-  box-shadow: var(--shadow-elevated);
+    box-shadow: var(--shadow-elevated);
 }
 
 .comparison-section {
-  max-width: 72rem;
-  margin: 0 auto;
-  margin-top: 5rem;
+    max-width: 72rem;
+    margin: 0 auto;
+    margin-top: 5rem;
 }
 
 .comparison-title {
-  font-size: 1.875rem;
-  font-weight: bold;
-  text-align: center;
-  color: var(--foreground);
-  margin-bottom: 2rem;
+    font-size: 1.875rem;
+    font-weight: bold;
+    text-align: center;
+    color: var(--foreground);
+    margin-bottom: 2rem;
 }
 
 .comparison-table {
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
 }
 
 .comparison-table table {
-  width: 100%;
-  border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .comparison-table thead {
-  background: linear-gradient(135deg, #292929 0%, #2e2e2e 100%);
+    background: linear-gradient(135deg, #292929 0%, #2e2e2e 100%);
 }
 
 .comparison-table th {
-  padding: 1rem 1.5rem;
-  text-align: left;
-  font-weight: bold;
-  color: var(--foreground);
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: bold;
+    color: var(--foreground);
 }
 
 .comparison-table td {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--border);
-  color: var(--foreground);
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--foreground);
 }
 
 .comparison-table tbody tr:hover {
-  background: rgba(41, 41, 41, 0.5);
+    background: rgba(41, 41, 41, 0.5);
 }
 
 @keyframes slide-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {
-  .subscription-title {
-    font-size: 1.875rem;
-  }
+    .subscription-title {
+        font-size: 1.875rem;
+    }
 
-  .subscription-subtitle {
-    font-size: 1rem;
-  }
+    .subscription-subtitle {
+        font-size: 1rem;
+    }
 
-  .plans-container {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
+    .plans-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
 
-  .plan-card.popular {
-    transform: scale(1);
-  }
+    .plan-card.popular {
+        transform: scale(1);
+    }
 
-  .comparison-table {
-    overflow-x: auto;
-  }
+    .comparison-table {
+        overflow-x: auto;
+    }
 
-  .comparison-table table {
-    min-width: 600px;
-  }
+    .comparison-table table {
+        min-width: 600px;
+    }
+}
+
+/* Animation for the rotating border */
+@keyframes bundle-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Specific class for the Custom Card container */
+.bundle-card-custom {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    border: 1px solid transparent !important; /* Hide default border to show animation */
+}
+
+/* The Animated Border Layer (Always Active) */
+.bundle-card-custom::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(transparent, #dc2626, #f87171, transparent 40%);
+    animation: bundle-rotate 4s linear infinite;
+    z-index: -2;
+}
+
+/* The Inner Mask (Matches your card background) */
+.bundle-card-custom::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background: var(--card);
+    border-radius: calc(1rem - 1px);
+    z-index: -1;
+}
+
+/* Customizer Row Styling */
+.custom-option-row {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+}
+
+.custom-option-row.active {
+    background: rgba(220, 38, 38, 0.08);
+    border-color: rgba(220, 38, 38, 0.3);
+}
+
+.option-label-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.option-icon-text {
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--foreground);
+}
+
+.custom-range-input {
+    width: 100%;
+    height: 5px;
+    border-radius: 5px;
+    background: var(--border);
+    outline: none;
+    accent-color: #dc2626; /* Your primary red */
+    cursor: pointer;
+}
+
+.count-display {
+    font-size: 11px;
+    text-align: right;
+    margin-top: 4px;
+    color: var(--muted-foreground);
+    font-weight: 500;
 }

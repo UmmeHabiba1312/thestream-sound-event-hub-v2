@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabase";
 import React, { useEffect, useState } from "react";
 import EventCard from "../components/events/EventCard";
 import { featuredAds, resaleTickets } from "../data/eventsData";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   ChevronLeft,
@@ -12,6 +13,7 @@ import {
 import "./Events.css";
 
 const Events = () => {
+  const navigate = useNavigate();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -73,20 +75,24 @@ const Events = () => {
     const qrValue = `${event.id}_${user.id}_${Date.now()}`;
 
     // 1️⃣ Insert ticket
-    const { error: ticketError } = await supabase.from("tickets").insert({
-      event_id: event.id,
-      owner_id: user.id,
-      qr_code: qrValue,
-      status: "active",
-    });
+    const { data, error } = await supabase
+      .from("tickets")
+      .insert({
+        event_id: event.id,
+        owner_id: user.id,
+        qr_code: qrValue,
+        status: "active",
+      })
+      .select()
+      .single();
 
-    if (ticketError) {
-      console.error(ticketError);
+    if (error) {
+      console.error(error);
       alert("Ticket purchase failed");
       return;
     }
 
-    // 2️⃣ Decrease available tickets
+    // 2️⃣ Reduce available tickets
     await supabase
       .from("events")
       .update({
@@ -94,8 +100,8 @@ const Events = () => {
       })
       .eq("id", event.id);
 
-    alert("Ticket purchased successfully 🎉");
-    fetchEvents(); // refresh UI
+    // 3️⃣ Redirect to ticket page
+    navigate(`/ticket/${data.id}`);
   };
 
   useEffect(() => {
@@ -500,7 +506,10 @@ const Events = () => {
               >
                 Cancel
               </button>
-              <button className="modal-btn submit">
+              <button
+                className="modal-btn submit"
+                onClick={() => buyTicket(selectedEvent)}
+              >
                 <Ticket size={18} /> Buy Ticket - ${selectedEvent.ticketPrice}
               </button>
             </div>
