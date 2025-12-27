@@ -26,7 +26,7 @@
   max-width: 80rem;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
   margin-bottom: 5rem;
 }
@@ -128,10 +128,12 @@
 
 .plan-features {
   margin-bottom: 2rem;
+    padding: 0px;
 }
 
 .plan-features > * + * {
   margin-top: 1rem;
+
 }
 
 .feature-item {
@@ -257,4 +259,96 @@
   .comparison-table table {
     min-width: 600px;
   }
+}
+
+
+/* Animation for the rotating border */
+@keyframes bundle-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Specific class for the Custom Card container */
+.bundle-card-custom {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  border: 1px solid transparent !important; /* Hide default border to show animation */
+}
+
+/* The Animated Border Layer (Always Active) */
+.bundle-card-custom::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    transparent,
+    #dc2626, 
+    #f87171, 
+    transparent 40%
+  );
+  animation: bundle-rotate 4s linear infinite;
+  z-index: -2;
+}
+
+/* The Inner Mask (Matches your card background) */
+.bundle-card-custom::after {
+  content: '';
+  position: absolute;
+  inset: 1px; 
+  background: var(--card); 
+  border-radius: calc(1rem - 1px);
+  z-index: -1;
+}
+
+/* Customizer Row Styling */
+.custom-option-row {
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+}
+
+.custom-option-row.active {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.option-label-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.option-icon-text {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--foreground);
+}
+
+.custom-range-input {
+  width: 100%;
+  height: 5px;
+  border-radius: 5px;
+  background: var(--border);
+  outline: none;
+  accent-color: #dc2626; /* Your primary red */
+  cursor: pointer;
+}
+
+.count-display {
+  font-size: 11px;
+  text-align: right;
+  margin-top: 4px;
+  color: var(--muted-foreground);
+  font-weight: 500;
 }

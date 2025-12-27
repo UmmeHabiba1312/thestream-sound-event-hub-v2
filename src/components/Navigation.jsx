@@ -7,7 +7,7 @@ import {
   Calendar,
   Menu,
   X,
-  Search,
+  // Search,
   Bell,
   Zap,
   LogOut,
@@ -24,7 +24,7 @@ const Navigation = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [user, setUser] = useState({ name: "Guest", email: "", id: null });
   const [isAdmin, setIsAdmin] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const userMenuRef = useRef(null);
@@ -130,12 +130,12 @@ const Navigation = () => {
     navigate("/login");
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
+  // const handleSearch = (e) => {
+  //   e.preventDefault();
+  //   if (searchQuery.trim()) {
+  //     navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+  //   }
+  // };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -169,7 +169,7 @@ const Navigation = () => {
           <span className="logo-text">StreamHub</span>
         </Link>
 
-        <form className="nav-search" onSubmit={handleSearch}>
+        {/* <form className="nav-search" onSubmit={handleSearch}>
           <input
             type="text"
             placeholder="Search videos, music, events..."
@@ -180,7 +180,7 @@ const Navigation = () => {
           <button type="submit" className="search-btn">
             <Search size={20} />
           </button>
-        </form>
+        </form> */}
 
         {/* Right side actions */}
         <div className="nav-right">

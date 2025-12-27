@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import EventCard from '../components/events/EventCard';
 import { eventsData, featuredAds, resaleTickets } from '../data/eventsData';
-import { Plus, ChevronLeft, ChevronRight, Ticket, RefreshCw } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Ticket as TicketIcon, RefreshCw } from 'lucide-react';
+import TicketComponent from "../components/ticket/Ticket";
 import './Events.css';
 
 const Events = () => {
@@ -9,6 +10,9 @@ const Events = () => {
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
+
+  const [showFinalTicket, setShowFinalTicket] = useState(false);
+  const [generatedTicket, setGeneratedTicket] = useState(null);
 
   const handleViewDetails = (event) => {
     setSelectedEvent(event);
@@ -23,15 +27,34 @@ const Events = () => {
     setCurrentAdIndex((prev) => (prev - 1 + featuredAds.length) % featuredAds.length);
   };
 
+  const handleBuyTicket = () => {
+    if (!selectedEvent) return;
+
+    const ticketData = {
+      eventName: selectedEvent.title,
+      ticketType: selectedEvent.ticketPrice === 0 ? "Complimentary ticket" : "General Admission",
+      venue: selectedEvent.venue,
+      date: new Date(selectedEvent.date).toLocaleDateString(),
+      time: selectedEvent.time,
+      qrCode: "/qr.png",
+      ticketId: Math.floor(100000000000 + Math.random() * 900000000000),
+    };
+
+    setGeneratedTicket(ticketData);
+    setShowTicketModal(false);
+    setShowFinalTicket(true);
+  };
+
   return (
     <div className="events-page">
+
       {/* Ad Banner Section */}
       <section className="ad-banner-section">
         <div className="ad-carousel">
           <button className="carousel-btn prev" onClick={prevAd}>
             <ChevronLeft size={24} />
           </button>
-          
+
           <div className="ad-banner animate-fade-in" key={currentAdIndex}>
             <img
               src={featuredAds[currentAdIndex].image}
@@ -40,16 +63,18 @@ const Events = () => {
             />
             <div className="ad-content">
               <h2 className="ad-title">{featuredAds[currentAdIndex].title}</h2>
-              <p className="ad-sponsor">Sponsored by {featuredAds[currentAdIndex].sponsor}</p>
+              <p className="ad-sponsor">
+                Sponsored by {featuredAds[currentAdIndex].sponsor}
+              </p>
               <button className="ad-btn">Learn More</button>
             </div>
           </div>
-          
+
           <button className="carousel-btn next" onClick={nextAd}>
             <ChevronRight size={24} />
           </button>
         </div>
-        
+
         <div className="ad-indicators">
           {featuredAds.map((_, index) => (
             <button
@@ -76,7 +101,11 @@ const Events = () => {
       {/* Events Grid */}
       <div className="events-grid">
         {eventsData.map((event) => (
-          <EventCard key={event.id} event={event} onViewDetails={handleViewDetails} />
+          <EventCard
+            key={event.id}
+            event={event}
+            onViewDetails={handleViewDetails}
+          />
         ))}
       </div>
 
@@ -87,6 +116,7 @@ const Events = () => {
           <h2 className="resale-title">Ticket Resale Marketplace</h2>
           <p className="resale-subtitle">Find tickets from verified sellers</p>
         </div>
+
         <div className="resale-grid">
           {resaleTickets.map((ticket) => (
             <div key={ticket.id} className="resale-card hover-lift">
@@ -95,71 +125,46 @@ const Events = () => {
                 <p className="resale-section">{ticket.section}</p>
                 <p className="resale-seller">Sold by {ticket.seller}</p>
               </div>
+
               <div className="resale-pricing">
                 <div className="original-price">${ticket.originalPrice}</div>
                 <div className="resale-price">${ticket.resalePrice}</div>
                 <div className="qty-available">{ticket.quantity} available</div>
               </div>
-              <button className="resale-buy-btn">
-                <Ticket size={16} />
-                Buy Ticket
+
+              <button
+                className="modal-btn submit"
+                onClick={() =>
+                  handleViewDetails({
+                    ...ticket,
+                    title: ticket.eventTitle,
+                    ticketPrice: ticket.resalePrice,
+                  })
+                }
+              >
+                <TicketIcon size={18} />
+                Buy Ticket - ${ticket.resalePrice}
               </button>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Create Event Modal */}
-      {showCreateModal && (
-        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Create New Event</h2>
-            <div className="form-group">
-              <label className="form-label">Event Title</label>
-              <input type="text" className="form-input" placeholder="Enter event title" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Description</label>
-              <textarea className="form-textarea" rows="4" placeholder="Describe your event"></textarea>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Date</label>
-                <input type="date" className="form-input" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Time</label>
-                <input type="time" className="form-input" />
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Venue</label>
-              <input type="text" className="form-input" placeholder="Event venue" />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Ticket Price ($)</label>
-                <input type="number" className="form-input" placeholder="99" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Total Capacity</label>
-                <input type="number" className="form-input" placeholder="500" />
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Upload Event Poster</label>
-              <div className="upload-area">
-                <Plus size={32} />
-                <p>Click to upload poster</p>
-                <input type="file" className="file-input" accept="image/*" />
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button className="modal-btn cancel" onClick={() => setShowCreateModal(false)}>
-                Cancel
-              </button>
-              <button className="modal-btn submit">Create Event</button>
-            </div>
+      {/* Final Ticket Output */}
+      {showFinalTicket && generatedTicket && (
+        <div className="modal-overlay" onClick={() => setShowFinalTicket(false)}>
+          <div
+            className="modal-content ticket-output-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <TicketComponent {...generatedTicket} />
+
+            <button
+              className="modal-btn submit mt-3"
+              onClick={() => setShowFinalTicket(false)}
+            >
+              Close Ticket
+            </button>
           </div>
         </div>
       )}
@@ -168,50 +173,47 @@ const Events = () => {
       {showTicketModal && selectedEvent && (
         <div className="modal-overlay" onClick={() => setShowTicketModal(false)}>
           <div className="modal-content ticket-modal" onClick={(e) => e.stopPropagation()}>
-            <img src={selectedEvent.poster} alt={selectedEvent.title} className="ticket-poster" />
+            <img
+              src={selectedEvent.poster}
+              alt={selectedEvent.title}
+              className="ticket-poster"
+            />
+
             <h2 className="modal-title">{selectedEvent.title}</h2>
             <p className="ticket-description">{selectedEvent.description}</p>
-            
+
             <div className="ticket-details">
               <div className="detail-row">
                 <span>Date & Time</span>
-                <span className="detail-value">{new Date(selectedEvent.date).toLocaleDateString()} at {selectedEvent.time}</span>
+                <span className="detail-value">
+                  {new Date(selectedEvent.date).toLocaleDateString()} at {selectedEvent.time}
+                </span>
               </div>
+
               <div className="detail-row">
                 <span>Venue</span>
                 <span className="detail-value">{selectedEvent.venue}</span>
               </div>
-              <div className="detail-row">
-                <span>Location</span>
-                <span className="detail-value">{selectedEvent.location}</span>
-              </div>
-              <div className="detail-row">
-                <span>Available Tickets</span>
-                <span className="detail-value">{selectedEvent.availableTickets} / {selectedEvent.totalCapacity}</span>
-              </div>
+
               <div className="detail-row total">
                 <span>Ticket Price</span>
                 <span className="detail-value">${selectedEvent.ticketPrice}</span>
               </div>
             </div>
 
-            <div className="qr-placeholder">
-              <div className="qr-code"></div>
-              <p className="qr-label">QR Code will be generated after purchase</p>
-            </div>
-
             <div className="modal-actions">
               <button className="modal-btn cancel" onClick={() => setShowTicketModal(false)}>
                 Cancel
               </button>
-              <button className="modal-btn submit">
-                <Ticket size={18} />
+              <button className="modal-btn submit" onClick={handleBuyTicket}>
+                <TicketIcon size={18} />
                 Buy Ticket - ${selectedEvent.ticketPrice}
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 };

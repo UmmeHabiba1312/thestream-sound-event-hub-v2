@@ -300,6 +300,81 @@
 .feature-card:hover .feature-arrow {
   transform: translateX(8px);
 }
+/* 1. Define the rotation for the gradient */
+@keyframes border-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.feature-card {
+  position: relative;
+  padding: 2rem;
+  border-radius: 1rem;
+  background-color: var(--card); /* Inner background color */
+  text-decoration: none;
+  overflow: hidden; /* Clips the rotating background */
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+  z-index: 1;
+  border: 1px solid var(--border); /* Default border */
+}
+
+/* 2. The Animated Border Layer */
+.feature-card::before {
+  content: '';
+  position: absolute;
+  /* Make it larger than the card so it covers corners when rotating */
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  /* Your specific red/coral gradient */
+  background: conic-gradient(
+    transparent,
+    #dc2626,
+    #f87171,
+    transparent 30%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -2;
+}
+
+/* 3. The "Mask" to keep the center of the card solid */
+.feature-card::after {
+  content: '';
+  position: absolute;
+  /* This creates a 1px gap to show the border */
+  inset: 1px; 
+  background: var(--card); 
+  border-radius: calc(1rem - 1px);
+  z-index: -1;
+}
+
+/* 4. Hover State: Start the border movement */
+.feature-card:hover {
+  border-color: transparent; /* Hide the static border */
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px -10px rgba(220, 38, 38, 0.3);
+}
+
+.feature-card::before {
+  opacity: 1;
+  animation: border-rotate 4s linear infinite;
+}
+
+/* 5. Ensure existing class content stays visible */
+.feature-icon-wrapper, 
+.feature-title, 
+.feature-description, 
+.feature-arrow {
+  position: relative;
+  z-index: 10;
+}
 
 /* Stats Section */
 .stats-section {
