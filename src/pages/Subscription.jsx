@@ -13,7 +13,7 @@ const Subscription = () => {
   const [videoCount, setVideoCount] = useState(5);
   const [addStreaming, setAddStreaming] = useState(false);
   const [streamingHours, setStreamingHours] = useState(10);
-
+  const [processingPlan, setProcessingPlan] = useState(null);
   const RATE_MUSIC = 2;
   const RATE_VIDEO = 5;
   const RATE_STREAM = 2;
@@ -27,7 +27,6 @@ const Subscription = () => {
   };
 
   const queryClient = useQueryClient();
-  const [isSubscribing, setIsSubscribing] = useState(false);
 
   const { data: userSubscription, isLoading } = useQuery({
     queryKey: ["userSubscription"],
@@ -75,7 +74,7 @@ const Subscription = () => {
       return;
     }
 
-    setIsSubscribing(true);
+    setProcessingPlan(planId);
 
     try {
       const { data, error } = await supabase.functions.invoke(
@@ -105,7 +104,7 @@ const Subscription = () => {
       console.error("Stripe Checkout Error:", err);
       alert(`Payment initialization failed: ${err.message}`);
     } finally {
-      setIsSubscribing(false);
+      setProcessingPlan(null);
     }
   };
 
@@ -202,9 +201,9 @@ const Subscription = () => {
             <button
               className={`plan-button ${plan.popular ? "premium" : ""}`}
               onClick={() => handleSubscribe(plan.id)}
-              disabled={isSubscribing || plan.id === currentPlan}
+              disabled={processingPlan === plan.id || plan.id === currentPlan}
             >
-              {isSubscribing ? "Processing..." : plan.buttonText}
+              {processingPlan === plan.id ? "Processing..." : plan.buttonText}
             </button>
           </div>
         ))}
@@ -314,10 +313,13 @@ const Subscription = () => {
               })
             }
             disabled={
-              isSubscribing || (!addMusic && !addVideo && !addStreaming)
+              processingPlan !== null ||
+              (!addMusic && !addVideo && !addStreaming)
             }
           >
-            {isSubscribing ? "Processing..." : "Purchase Bundle"}
+            {processingPlan === "custom_bundle"
+              ? "Processing..."
+              : "Purchase Bundle"}
           </button>
         </div>
       </div>
