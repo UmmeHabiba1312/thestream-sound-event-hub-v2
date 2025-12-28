@@ -32,12 +32,10 @@ const VideoSidebar = ({
   const [watchLaterCount, setWatchLaterCount] = useState(0);
   const [likedCount, setLikedCount] = useState(0);
 
-const toggleSidebar = () => {
+  const toggleSidebar = () => {
     setCollapsed(!collapsed);
     if (onCollapse) onCollapse(!collapsed);
-};
-
-
+  };
 
   useEffect(() => {
     const fetchData = async (user) => {
@@ -82,7 +80,8 @@ const toggleSidebar = () => {
           `
  channel_id,
  profiles!channel_subscriptions_channel_id_fkey (full_name, avatar_url)
- `
+ `,
+
         )
         .eq("user_id", userId);
 
@@ -108,7 +107,8 @@ const toggleSidebar = () => {
           setCurrentUser(null);
           setSubscriptions([]);
         }
-      }
+      },
+
     );
 
     fetchData(null);
@@ -132,10 +132,18 @@ const toggleSidebar = () => {
   ];
 
   return (
-    <aside className={`video-sidebar ${collapsed || parentCollapsed ? "collapsed" : ""}`}>
-
+    <aside
+      className={`video-sidebar ${collapsed || parentCollapsed ? "collapsed" : ""}`}
+    >
       <button className="collapse-btn" onClick={toggleSidebar}>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white" style={{ pointerEvents: "none", display: "block", margin: "0 auto" }}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="white"
+          style={{ pointerEvents: "none", display: "block", margin: "0 auto" }}
+        >
           <path d="M20 5H4a1 1 0 000 2h16a1 1 0 100-2Zm0 6H4a1 1 0 000 2h16a1 1 0 000-2Zm0 6H4a1 1 0 000 2h16a1 1 0 000-2Z"></path>
         </svg>
       </button>
@@ -156,7 +164,10 @@ const toggleSidebar = () => {
 
         {currentUser && (
           <>
-            <div className="section-title">{!collapsed && <span>Subscriptions</span>}</div>
+            <div className="section-title">
+              {!collapsed && <span>Subscriptions</span>}
+            </div>
+
 
             {loading ? (
               <p className="loading-text">{!collapsed && "Loading..."}</p>
@@ -169,7 +180,12 @@ const toggleSidebar = () => {
                     onCategoryChange(`channel_${sub.id}_${sub.name.replace(/\s+/g, "~")}`)
                   }
                 >
-                  <img src={sub.avatarUrl} alt={sub.name} className="subscription-avatar" />
+
+                  <img
+                    src={sub.avatarUrl}
+                    alt={sub.name}
+                    className="subscription-avatar"
+                  />
                   {!collapsed && <span>{sub.name}</span>}
                 </button>
               ))

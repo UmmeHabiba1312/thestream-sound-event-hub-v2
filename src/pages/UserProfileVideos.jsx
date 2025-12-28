@@ -13,13 +13,19 @@ export const UserProfileVideos = ({ userId }) => {
     setLoading(true);
     const { data } = await supabase
       .from("videos")
-      .select("*")
+      .select(
+        `
+              *,
+              views:video_views (count)
+            `,
+      )
       .eq("uploaded_by", userId)
       .order("created_at", { ascending: false });
 
     if (data) {
       const formatted = data.map((v) => ({
         ...v,
+        viewsCount: v.views && v.views[0] ? v.views[0].count : 0,
         videoUrl: supabase.storage.from("video").getPublicUrl(v.video_url).data
           .publicUrl,
         thumbnailUrl: v.thumbnail_url

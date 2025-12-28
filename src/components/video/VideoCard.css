@@ -103,3 +103,18 @@
 .meta-separator {
     color: var(--text-muted);
 }
+
+.pulse {
+    animation: pulse-animation 1.5s infinite;
+}
+@keyframes pulse-animation {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 1;
+    }
+}

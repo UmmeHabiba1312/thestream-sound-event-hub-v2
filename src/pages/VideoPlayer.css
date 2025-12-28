@@ -422,7 +422,7 @@
     gap:20px
 }
 .reply-buttons, .edit-actions .cancel-btn, .cancel-edit-btn{
-    background-color: #acacac;
+    /* background-color: #acacac; */
     color: white;
     border: none;
     padding: 4px 10px;
@@ -430,12 +430,12 @@
     font-size: 8px;
 }
 .reply-buttons, .edit-actions .cancel-btn:hover{
-    background-color: #3ea6ff;
+    background-color: transparent;
     color: white;
     border: none;
 }
 .reply-buttons, .edit-actions .reply-btn, .save-edit-btn{
-background-color: #e72121;
+/* background-color: #e72121; */
     color: white;
     border: none;
     padding: 4px 10px;

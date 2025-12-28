@@ -1,15 +1,215 @@
-import React, { useState } from 'react';
-import EventCard from '../components/events/EventCard';
-import { eventsData, featuredAds, resaleTickets } from '../data/eventsData';
-import { Plus, ChevronLeft, ChevronRight, Ticket as TicketIcon, RefreshCw } from 'lucide-react';
-import TicketComponent from "../components/ticket/Ticket";
-import './Events.css';
+
+import { supabase } from "../lib/supabase";
+import React, { useEffect, useState } from "react";
+import EventCard from "../components/events/EventCard";
+import { featuredAds, resaleTickets } from "../data/eventsData";
+import { useNavigate } from "react-router-dom";
+import {
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Ticket,
+  RefreshCw,
+} from "lucide-react";
+import "./Events.css";
+
 
 const Events = () => {
+  const navigate = useNavigate();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
+  const [events, setEvents] = useState([]);
+  const [user, setUser] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    date: "",
+    time: "",
+    venue: "",
+    price: "",
+    capacity: "",
+    poster: null,
+  });
+
+  // Fetch approved events from Supabase
+  const fetchEvents = async () => {
+    const { data, error } = await supabase
+      .from("events")
+      .select("*")
+      .eq("status", "approved") // ✅ only approved events
+      .order("event_datetime", { ascending: true });
+
+    if (!error && data) {
+      const mappedEvents = data.map((e) => ({
+        id: e.id,
+        title: e.title,
+        description: e.description,
+        date: e.event_datetime,
+        time: new Date(e.event_datetime).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        venue: e.venue,
+        location: e.venue,
+        ticketPrice: e.ticket_price,
+        totalCapacity: e.total_tickets,
+        availableTickets: e.available_tickets,
+        poster: e.poster_url || "/default-event.jpg",
+        category: "Live Event",
+      }));
+      setEvents(mappedEvents);
+    }
+  };
+
+  const buyTicket = async (event) => {
+    if (!user) {
+      alert("Please login to buy ticket");
+      return;
+    }
+
+    if (event.availableTickets <= 0) {
+      alert("Tickets sold out");
+      return;
+    }
+
+    const qrValue = `${event.id}_${user.id}_${Date.now()}`;
+
+    // 1️⃣ Insert ticket
+    const { data, error } = await supabase
+      .from("tickets")
+      .insert({
+        event_id: event.id,
+        owner_id: user.id,
+        qr_code: qrValue,
+        status: "active",
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error(error);
+      alert("Ticket purchase failed");
+      return;
+    }
+
+    // 2️⃣ Reduce available tickets
+    await supabase
+      .from("events")
+      .update({
+        available_tickets: event.availableTickets - 1,
+      })
+      .eq("id", event.id);
+
+    // 3️⃣ Redirect to ticket page
+    navigate(`/ticket/${data.id}`);
+  };
+
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
+
+      setUser(currentUser);
+    };
+
+    getUser();
+    fetchEvents();
+  }, []);
+
+  // Handle Create Event
+  const handleCreateEvent = async () => {
+    try {
+      if (!user) {
+        alert("You must be logged in to create an event");
+        return;
+      }
+
+      const { title, description, date, time, venue, price, capacity, poster } =
+        formData;
+
+      if (
+        !title ||
+        !description ||
+        !date ||
+        !time ||
+        !venue ||
+        !price ||
+        !capacity
+      ) {
+        alert("Please fill in all required fields");
+        return;
+      }
+
+      let posterUrl = null;
+      if (poster) {
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("event-posters")
+          .upload(`posters/${Date.now()}_${poster.name}`, poster);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData, error: urlError } = supabase.storage
+          .from("event-posters")
+          .getPublicUrl(uploadData.path);
+
+        if (urlError) throw urlError;
+        posterUrl = urlData.publicUrl;
+      }
+
+      const eventDateTime = new Date(`${date}T${time}`);
+      console.log("Inserting event:", {
+        title,
+        description,
+        event_datetime: eventDateTime,
+        venue,
+        ticket_price: Number(price),
+        total_tickets: Number(capacity),
+        available_tickets: Number(capacity),
+        poster_url: posterUrl,
+        created_by: user.id,
+        status: "pending",
+      });
+
+      const { error } = await supabase.from("events").insert({
+        title,
+        description,
+        event_datetime: eventDateTime,
+        venue,
+        ticket_price: Number(price),
+        total_tickets: Number(capacity),
+        available_tickets: Number(capacity),
+        poster_url: posterUrl,
+        created_by: user.id,
+        status: "pending",
+      });
+
+      if (error) {
+        console.error("Insert error:", error);
+        alert("Error creating event. Check console.");
+        return;
+      }
+
+      setShowCreateModal(false);
+      fetchEvents();
+      alert("Event submitted for admin approval");
+      setFormData({
+        title: "",
+        description: "",
+        date: "",
+        time: "",
+        venue: "",
+        price: "",
+        capacity: "",
+        poster: null,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Error creating event. Please try again.");
+    }
+  };
 
   const [showFinalTicket, setShowFinalTicket] = useState(false);
   const [generatedTicket, setGeneratedTicket] = useState(null);
@@ -19,13 +219,12 @@ const Events = () => {
     setShowTicketModal(true);
   };
 
-  const nextAd = () => {
+  const nextAd = () =>
     setCurrentAdIndex((prev) => (prev + 1) % featuredAds.length);
-  };
-
-  const prevAd = () => {
-    setCurrentAdIndex((prev) => (prev - 1 + featuredAds.length) % featuredAds.length);
-  };
+  const prevAd = () =>
+    setCurrentAdIndex(
+      (prev) => (prev - 1 + featuredAds.length) % featuredAds.length,
+    );
 
   const handleBuyTicket = () => {
     if (!selectedEvent) return;
@@ -79,7 +278,7 @@ const Events = () => {
           {featuredAds.map((_, index) => (
             <button
               key={index}
-              className={`indicator ${index === currentAdIndex ? 'active' : ''}`}
+              className={`indicator ${index === currentAdIndex ? "active" : ""}`}
               onClick={() => setCurrentAdIndex(index)}
             />
           ))}
@@ -92,22 +291,25 @@ const Events = () => {
           <h1 className="events-title">Upcoming Events</h1>
           <p className="events-subtitle">Book your tickets to amazing events</p>
         </div>
-        <button className="create-event-btn" onClick={() => setShowCreateModal(true)}>
-          <Plus size={20} />
-          Create Event
+        <button
+          className="create-event-btn"
+          onClick={() => setShowCreateModal(true)}
+        >
+          <Plus size={20} /> Create Event
         </button>
       </div>
 
       {/* Events Grid */}
-      <div className="events-grid">
-        {eventsData.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            onViewDetails={handleViewDetails}
-          />
-        ))}
-      </div>
+    <div className="events-grid">
+  {events.map((event) => (
+    <EventCard
+      key={event.id}
+      event={event}
+      onViewDetails={handleViewDetails}
+    />
+  ))}
+</div>
+
 
       {/* Resale Marketplace */}
       <section className="resale-section">
@@ -131,48 +333,157 @@ const Events = () => {
                 <div className="resale-price">${ticket.resalePrice}</div>
                 <div className="qty-available">{ticket.quantity} available</div>
               </div>
-
-              <button
-                className="modal-btn submit"
-                onClick={() =>
-                  handleViewDetails({
-                    ...ticket,
-                    title: ticket.eventTitle,
-                    ticketPrice: ticket.resalePrice,
-                  })
-                }
-              >
-                <TicketIcon size={18} />
-                Buy Ticket - ${ticket.resalePrice}
-              </button>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Final Ticket Output */}
-      {showFinalTicket && generatedTicket && (
-        <div className="modal-overlay" onClick={() => setShowFinalTicket(false)}>
-          <div
-            className="modal-content ticket-output-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <TicketComponent {...generatedTicket} />
 
-            <button
-              className="modal-btn submit mt-3"
-              onClick={() => setShowFinalTicket(false)}
-            >
-              Close Ticket
-            </button>
+      {/* Create Event Modal */}
+      {showCreateModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowCreateModal(false)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">Create New Event</h2>
+            <div className="form-group">
+              <label className="form-label">Event Title</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Enter event title"
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Description</label>
+              <textarea
+                className="form-textarea"
+                rows="4"
+                placeholder="Describe your event"
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+              />
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Date</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Time</label>
+                <input
+                  type="time"
+                  className="form-input"
+                  onChange={(e) =>
+                    setFormData({ ...formData, time: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Venue</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Event venue"
+                onChange={(e) =>
+                  setFormData({ ...formData, venue: e.target.value })
+                }
+              />
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Ticket Price ($)</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  placeholder="99"
+                  onChange={(e) =>
+                    setFormData({ ...formData, price: e.target.value })
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Total Capacity</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  placeholder="500"
+                  onChange={(e) =>
+                    setFormData({ ...formData, capacity: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Upload Event Poster</label>
+              <div className="upload-area">
+                <label className="upload-area">
+                  <Plus size={32} />
+                  <p>Click to upload poster</p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setFormData({ ...formData, poster: e.target.files[0] })
+                    }
+                    style={{ display: "none" }}
+                  />
+                </label>
+                {/* Poster preview */}
+                {formData.poster && (
+                  <img
+                    src={URL.createObjectURL(formData.poster)}
+                    alt="Poster preview"
+                    className="poster-preview"
+                    style={{
+                      marginTop: "10px",
+                      maxWidth: "100%",
+                      borderRadius: "8px",
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button
+                className="modal-btn cancel"
+                onClick={() => setShowCreateModal(false)}
+              >
+                Cancel
+              </button>
+              <button className="modal-btn submit" onClick={handleCreateEvent}>
+                Create Event
+              </button>
+            </div>
+
           </div>
         </div>
       )}
 
       {/* Ticket Purchase Modal */}
       {showTicketModal && selectedEvent && (
-        <div className="modal-overlay" onClick={() => setShowTicketModal(false)}>
-          <div className="modal-content ticket-modal" onClick={(e) => e.stopPropagation()}>
+
+        <div
+          className="modal-overlay"
+          onClick={() => setShowTicketModal(false)}
+        >
+          <div
+            className="modal-content ticket-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+
             <img
               src={selectedEvent.poster}
               alt={selectedEvent.title}
@@ -186,7 +497,7 @@ const Events = () => {
               <div className="detail-row">
                 <span>Date & Time</span>
                 <span className="detail-value">
-                  {new Date(selectedEvent.date).toLocaleDateString()} at {selectedEvent.time}
+
                 </span>
               </div>
 
@@ -195,19 +506,41 @@ const Events = () => {
                 <span className="detail-value">{selectedEvent.venue}</span>
               </div>
 
+              <div className="detail-row">
+                <span>Location</span>
+                <span className="detail-value">{selectedEvent.location}</span>
+              </div>
+              <div className="detail-row">
+                <span>Available Tickets</span>
+                <span className="detail-value">
+                  {selectedEvent.availableTickets} /{" "}
+                  {selectedEvent.totalCapacity}
+                </span>
+              </div>
+
               <div className="detail-row total">
                 <span>Ticket Price</span>
-                <span className="detail-value">${selectedEvent.ticketPrice}</span>
+                <span className="detail-value">
+                  ${selectedEvent.ticketPrice}
+                </span>
               </div>
             </div>
 
+
             <div className="modal-actions">
-              <button className="modal-btn cancel" onClick={() => setShowTicketModal(false)}>
+              <button
+                className="modal-btn cancel"
+                onClick={() => setShowTicketModal(false)}
+              >
                 Cancel
               </button>
-              <button className="modal-btn submit" onClick={handleBuyTicket}>
-                <TicketIcon size={18} />
-                Buy Ticket - ${selectedEvent.ticketPrice}
+
+              <button
+                className="modal-btn submit"
+                onClick={() => buyTicket(selectedEvent)}
+              >
+                <Ticket size={18} /> Buy Ticket - ${selectedEvent.ticketPrice}
+
               </button>
             </div>
           </div>
