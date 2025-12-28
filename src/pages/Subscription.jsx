@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
 // 1. FIXED: Added missing icon imports
-<<<<<<< HEAD
-import { Check, Zap, Music, Video, Radio } from "lucide-react"; 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "../lib/supabase"; 
-=======
+
 import { Check, Zap, Music, Video, Radio } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
->>>>>>> backend-check
+
 import "./Subscription.css";
 
 const Subscription = () => {
@@ -19,24 +15,7 @@ const Subscription = () => {
   const [videoCount, setVideoCount] = useState(5);
   const [addStreaming, setAddStreaming] = useState(false);
   const [streamingHours, setStreamingHours] = useState(10);
-<<<<<<< HEAD
 
-  const RATE_MUSIC = 2;
-  const RATE_VIDEO = 5;
-  const RATE_STREAM = 10;
-
-  const calculateTotal = () => {
-    let total = 0;
-    if (addMusic) total += musicCount * RATE_MUSIC;
-    if (addVideo) total += videoCount * RATE_VIDEO;
-    if (addStreaming) total += streamingHours * RATE_STREAM;
-    return total;
-  };
-
-  const queryClient = useQueryClient();
-  const [isSubscribing, setIsSubscribing] = useState(false);
-
-=======
   const [processingPlan, setProcessingPlan] = useState(null);
   const RATE_MUSIC = 2;
   const RATE_VIDEO = 5;
@@ -52,7 +31,6 @@ const Subscription = () => {
 
   const queryClient = useQueryClient();
 
->>>>>>> backend-check
   const { data: userSubscription, isLoading } = useQuery({
     queryKey: ["userSubscription"],
     queryFn: async () => {
@@ -87,23 +65,17 @@ const Subscription = () => {
 
     if (planId === "free") {
       alert("Switching to Free plan...");
-<<<<<<< HEAD
-      await supabase.from("profiles").update({ subscription_plan: "free", subscription_expires_at: null }).eq("id", user.id);
-=======
+
       await supabase
         .from("profiles")
         .update({ subscription_plan: "free", subscription_expires_at: null })
         .eq("id", user.id);
->>>>>>> backend-check
       queryClient.invalidateQueries(["userSubscription"]);
       return;
     }
 
-<<<<<<< HEAD
-    setIsSubscribing(true);
-=======
     setProcessingPlan(planId);
->>>>>>> backend-check
+
 
     try {
       const { data, error } = await supabase.functions.invoke(
@@ -112,11 +84,9 @@ const Subscription = () => {
           body: {
             plan_id: planId, // yahan "custom_bundle" jayega
             userId: user.id,
-<<<<<<< HEAD
-            // 3. FIXED: These now use the customData argument safely
-=======
+
             // 🎯 Ye teen cheezain Stripe ko batani hain taake wo DB mein add ho saken
->>>>>>> backend-check
+
             music_tracks: customData?.music || 0,
             video_uploads: customData?.videos || 0,
             streaming_hours: customData?.streaming || 0,
@@ -137,20 +107,14 @@ const Subscription = () => {
       console.error("Stripe Checkout Error:", err);
       alert(`Payment initialization failed: ${err.message}`);
     } finally {
-<<<<<<< HEAD
-      setIsSubscribing(false);
-=======
+
       setProcessingPlan(null);
->>>>>>> backend-check
+
     }
   };
 
   const plans = [
-<<<<<<< HEAD
-    { id: "free", name: "Free", price: "$0", period: "forever", uploads: "3 music videos", features: ["Upload up to 3 music videos"], buttonText: "Get Started", popular: false },
-    { id: "standard", name: "Standard", price: "$49", period: "per year", uploads: "10 music videos", features: ["Upload up to 10 music videos", " 1hr HD quality streaming", "Priority support",], buttonText: "Upgrade to Standard", popular: true },
-    { id: "premium", name: "Premium", price: "$149", period: "per year", uploads: "Unlimited music videos", features: ["Unlimited music video uploads", "10hr quality streaming", "24/7 VIP support",], buttonText: "Go Premium", popular: false },
-=======
+
     {
       id: "free",
       name: "Free",
@@ -189,7 +153,7 @@ const Subscription = () => {
       buttonText: "Go Premium",
       popular: false,
     },
->>>>>>> backend-check
+
   ];
 
   if (isLoading) return <div>Loading subscription...</div>;
@@ -198,11 +162,7 @@ const Subscription = () => {
   return (
     <div className="subscription-page">
       <div className="subscription-header">
-<<<<<<< HEAD
-        <h1 className="subscription-title">Choose Your <span className="text-gradient">Perfect Plan</span></h1>
-        <p className="subscription-subtitle">Unlock unlimited creativity with our premium subscription plans or Customize your own package</p>
-        <p className="current-plan">Current Plan: {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}</p>
-=======
+
         <h1 className="subscription-title">
           Choose Your <span className="text-gradient">Perfect Plan</span>
         </h1>
@@ -214,16 +174,12 @@ const Subscription = () => {
           Current Plan:{" "}
           {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
         </p>
->>>>>>> backend-check
+
       </div>
 
       <div className="plans-container">
         {plans.map((plan) => (
-<<<<<<< HEAD
-          <div key={plan.id} className={`plan-card ${plan.popular ? "popular" : ""} ${plan.id === currentPlan ? "current" : ""}`}>
-            {plan.popular && <div className="popular-badge"><Zap size={14} fill="currentColor" /> Most Popular</div>}
-            {plan.id === currentPlan && <div className="current-badge">Current Plan</div>}
-=======
+
           <div
             key={plan.id}
             className={`plan-card ${plan.popular ? "popular" : ""} ${plan.id === currentPlan ? "current" : ""}`}
@@ -236,7 +192,7 @@ const Subscription = () => {
             {plan.id === currentPlan && (
               <div className="current-badge">Current Plan</div>
             )}
->>>>>>> backend-check
+
             <div className="plan-header">
               <h3 className="plan-name">{plan.name}</h3>
               <div className="plan-price"><span className="price-amount">{plan.price}</span><span className="price-period">/{plan.period}</span></div>
@@ -247,17 +203,13 @@ const Subscription = () => {
                 <li key={index} className="feature-item"><Check className="check-icon" size={20} /><span>{feature}</span></li>
               ))}
             </ul>
-<<<<<<< HEAD
-            <button className={`plan-button ${plan.popular ? "premium" : ""}`} onClick={() => handleSubscribe(plan.id)} disabled={isSubscribing || plan.id === currentPlan}>
-              {isSubscribing ? "Processing..." : plan.buttonText}
-=======
+
             <button
               className={`plan-button ${plan.popular ? "premium" : ""}`}
               onClick={() => handleSubscribe(plan.id)}
               disabled={processingPlan === plan.id || plan.id === currentPlan}
             >
               {processingPlan === plan.id ? "Processing..." : plan.buttonText}
->>>>>>> backend-check
             </button>
           </div>
         ))}
@@ -273,41 +225,6 @@ const Subscription = () => {
             <p className="plan-uploads">Select only what you need</p>
           </div>
           <div className="custom-controls-wrapper">
-<<<<<<< HEAD
-            <div className={`custom-option-row ${addMusic ? 'active' : ''}`}>
-              <div className="option-label-group">
-                <span className="option-icon-text"><Music size={16} color="#dc2626" /> Music Tracks</span>
-                <input type="checkbox" checked={addMusic} onChange={(e) => setAddMusic(e.target.checked)} />
-              </div>
-              {addMusic && (
-                <>
-                  <input type="range" min="1" max="100" value={musicCount} onChange={(e) => setMusicCount(e.target.value)} className="custom-range-input" />
-                  <div className="count-display">{musicCount} tracks selected</div>
-                </>
-              )}
-            </div>
-            <div className={`custom-option-row ${addVideo ? 'active' : ''}`}>
-              <div className="option-label-group">
-                <span className="option-icon-text"><Video size={16} color="#dc2626" /> Video Uploads</span>
-                <input type="checkbox" checked={addVideo} onChange={(e) => setAddVideo(e.target.checked)} />
-              </div>
-              {addVideo && (
-                <>
-                  <input type="range" min="1" max="50" value={videoCount} onChange={(e) => setVideoCount(e.target.value)} className="custom-range-input" />
-                  <div className="count-display">{videoCount} videos selected</div>
-                </>
-              )}
-            </div>
-            <div className={`custom-option-row ${addStreaming ? 'active' : ''}`}>
-              <div className="option-label-group">
-                <span className="option-icon-text"><Radio size={16} color="#dc2626" /> Live Streaming</span>
-                <input type="checkbox" checked={addStreaming} onChange={(e) => setAddStreaming(e.target.checked)} />
-              </div>
-              {addStreaming && (
-                <>
-                  <input type="range" min="1" max="24" value={streamingHours} onChange={(e) => setStreamingHours(e.target.value)} className="custom-range-input" />
-                  <div className="count-display">{streamingHours} hours selected</div>
-=======
             <div className={`custom-option-row ${addMusic ? "active" : ""}`}>
               <div className="option-label-group">
                 <span className="option-icon-text">
@@ -388,19 +305,14 @@ const Subscription = () => {
                   <div className="count-display">
                     {streamingHours} hours selected
                   </div>
->>>>>>> backend-check
+
                 </>
               )}
             </div>
           </div>
           <button
             className="plan-button premium"
-<<<<<<< HEAD
-            onClick={() => handleSubscribe("custom_bundle", { music: addMusic ? musicCount : 0, videos: addVideo ? videoCount : 0, streaming: addStreaming ? streamingHours : 0 })}
-            disabled={isSubscribing || (!addMusic && !addVideo && !addStreaming)}
-          >
-            {isSubscribing ? "Processing..." : "Purchase Bundle"}
-=======
+
             onClick={() =>
               handleSubscribe("custom_bundle", {
                 music: addMusic ? musicCount : 0,
@@ -416,7 +328,7 @@ const Subscription = () => {
             {processingPlan === "custom_bundle"
               ? "Processing..."
               : "Purchase Bundle"}
->>>>>>> backend-check
+
           </button>
         </div>
       </div>
