@@ -23,21 +23,12 @@
 }
 
 .plans-container {
-<<<<<<< HEAD
   max-width: 80rem;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
   margin-bottom: 5rem;
-=======
-    max-width: 80rem;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-    margin-bottom: 5rem;
->>>>>>> backend-check
 }
 
 .plan-card {
@@ -136,21 +127,15 @@
 }
 
 .plan-features {
-<<<<<<< HEAD
-  margin-bottom: 2rem;
-=======
+
     margin-bottom: 2rem;
->>>>>>> backend-check
+
     padding: 0px;
 }
 
 .plan-features > * + * {
-<<<<<<< HEAD
-  margin-top: 1rem;
-
-=======
     margin-top: 1rem;
->>>>>>> backend-check
+
 }
 
 .feature-item {
