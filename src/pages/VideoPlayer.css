@@ -408,49 +408,41 @@
     border-radius: 4px;
     z-index: 10;
 }
-.reply-input-box,
-.edit-box input {
+.reply-input-box, .edit-box input{
     border: none;
     outline: none;
-    background: transparent;
+   background: transparent;
     border-bottom: 2px solid #aaa;
     color: white;
 }
-.reply-buttons,
-.edit-actions {
+.reply-buttons, .edit-actions{
     margin-top: 10px;
     margin-bottom: 12px;
     display: flex;
-    gap: 20px;
+    gap:20px
 }
-.reply-buttons,
-.edit-actions .cancel-btn,
-.cancel-edit-btn {
-    background-color: #acacac;
+.reply-buttons, .edit-actions .cancel-btn, .cancel-edit-btn{
+    /* background-color: #acacac; */
     color: white;
     border: none;
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 8px;
 }
-  
-.reply-buttons,
-.edit-actions .cancel-btn:hover {
-    background-color: #3ea6ff;
+.reply-buttons, .edit-actions .cancel-btn:hover{
+    background-color: transparent;
     color: white;
     border: none;
 }
-.reply-buttons,
-.edit-actions .reply-btn,
-.save-edit-btn {
-    background-color: #e72121;
+.reply-buttons, .edit-actions .reply-btn, .save-edit-btn{
+/* background-color: #e72121; */
     color: white;
     border: none;
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 8px;
 }
-.reply-buttons .reply-btn:hover {
-    background-color: #9b5252;
+.reply-buttons .reply-btn:hover{
+background-color: #9b5252;
     color: white;
 }

@@ -254,7 +254,7 @@ const Navigation = () => {
       <div className="nav-container">
         <Link to="/" className="nav-logo">
           <div className="logo-icon">
-            <img src="/assets/logo.jpeg" alt="logo" className="logo-image" />
+            {/* <img src="/assets/logo.jpeg" alt="logo" className="logo-image" /> */}
           </div>
           <span className="logo-text">StreamHub</span>
         </Link>
@@ -381,52 +381,12 @@ const Navigation = () => {
           </div>
 
           <div className="nav-actions">
-            <Link to="/subscription" className="upgrade-btn">
+            {/* <Link to="/subscription" className="upgrade-btn">
               <Zap size={12} fill="currentColor" />
               <span>Upgrade</span>
-            </Link>
+            </Link> */}
 
-            {/* Notifications */}
-            <div className="notification-container" ref={notifRef}>
-              <button
-                className="nav-action-btn"
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  if (!showNotifications) markAsRead();
-                }}
-              >
-                <Bell size={20} />
-                {unreadCount > 0 && (
-                  <span className="notif-badge">{unreadCount}</span>
-                )}
-              </button>
-              {showNotifications && (
-                <div className="notif-dropdown">
-                  <div className="notif-header">Notifications</div>
-                  <div className="notif-list">
-                    {notifications.length > 0 ? (
-                      notifications.map((n) => (
-                        <div
-                          key={n.id}
-                          className={`notif-item ${
-                            !n.is_read ? "unread" : ""
-                          }`}
-                        >
-                          <p className="notif-msg">{n.message}</p>
-                          <span className="notif-time">
-                            <Clock size={12} style={{ marginRight: "4px" }} />{" "}
-                            {new Date(n.created_at).toLocaleTimeString()}
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="notif-empty">No new notifications</div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
+          
             <div className="user-menu-wrapper" ref={userMenuRef}>
               <button
                 className="profile-circle-btn"

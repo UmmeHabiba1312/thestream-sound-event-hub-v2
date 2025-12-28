@@ -516,7 +516,7 @@
   position: relative;
   overflow: hidden;
   padding: 5rem 1rem;
-  background: url('/assets/logo.jpeg') center/contain no-repeat;
+  /* background: url('/assets/logo.jpeg') center/contain no-repeat; */
 }
 
 .hero-bg-overlay {
