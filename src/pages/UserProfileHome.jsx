@@ -23,15 +23,73 @@ export const UserProfileHome = ({ userId }) => {
         .order('created_at', { ascending: false });
 
       if (videoData) {
-        setVideos(videoData.map(v => ({
-          ...v,
-          videoUrl: supabase.storage.from('video').getPublicUrl(v.video_url).data.publicUrl,
-          thumbnailUrl: v.thumbnail_url 
-             ? supabase.storage.from('thumbnails').getPublicUrl(v.thumbnail_url).data.publicUrl 
-             : '/default-thumbnail.jpg'
-        })));
-      }
+        setVideos(
+          videoData.map((video) => {
+            const isLiveCategory = video.category === "Live";
+            const isCurrentlyLive =
+              video.stream_status === "live" ||
+              video.stream_status === "active";
+            const videoUrlFromDB = video.video_url || "";
 
+            // --- VIDEO URL LOGIC ---
+            let finalVideoUrl = "";
+            if (videoUrlFromDB.includes("https://")) {
+              // Already full URL
+              finalVideoUrl = videoUrlFromDB;
+            } else if (isLiveCategory) {
+              // Live videos
+              if (isCurrentlyLive) {
+                finalVideoUrl = `https://livepeercdn.studio/hls/${videoUrlFromDB}/index.m3u8`;
+              } else {
+                // Archive / Finished fallback
+                finalVideoUrl = `https://vod-cdn.lp-playback.studio/hls/${videoUrlFromDB}/thumbnails/keyframes_0.jpg`;
+              }
+            } else {
+              // Normal videos: Supabase storage
+              finalVideoUrl = supabase.storage
+                .from("video")
+                .getPublicUrl(videoUrlFromDB).data.publicUrl;
+            }
+
+            // --- THUMBNAIL LOGIC ---
+            let finalThumbnailUrl = "/live_placeholder.png"; // Default
+
+            const isLivepeerVideo =
+              video.category === "Live" || video.category === "Archive";
+
+            if (isLivepeerVideo) {
+              if (
+                video.thumbnail_url &&
+                video.thumbnail_url.startsWith("http")
+              ) {
+                finalThumbnailUrl = video.thumbnail_url + `?t=${Date.now()}`;
+              } else if (video.video_url && video.video_url.length > 10) {
+                finalThumbnailUrl = `https://vod-cdn.lp-playback.studio/hls/${video.video_url}/thumbnails/keyframes_0.jpg?cb=${Date.now()}`;
+              }
+            } else if (video.thumbnail_url) {
+              finalThumbnailUrl = video.thumbnail_url.startsWith("http")
+                ? video.thumbnail_url
+                : supabase.storage
+                    .from("thumbnails")
+                    .getPublicUrl(video.thumbnail_url).data.publicUrl +
+                  `?cb=${Date.now()}`;
+            }
+
+            return {
+              ...video,
+              videoUrl: finalVideoUrl,
+              thumbnailUrl: finalThumbnailUrl,
+              duration: isLiveCategory
+                ? isCurrentlyLive
+                  ? "LIVE"
+                  : "REC"
+                : video.duration || "00:00",
+              viewsCount:
+                video.views && video.views[0] ? video.views[0].count : 0,
+            };
+          }),
+        );
+      }
       // 2. Fetch All Music
       const { data: musicData } = await supabase
         .from('content_uploads')

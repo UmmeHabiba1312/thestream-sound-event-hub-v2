@@ -23,20 +23,72 @@ export const UserProfileVideos = ({ userId }) => {
       .order("created_at", { ascending: false });
 
     if (data) {
-      const formatted = data.map((v) => ({
-        ...v,
-        viewsCount: v.views && v.views[0] ? v.views[0].count : 0,
-        videoUrl: supabase.storage.from("video").getPublicUrl(v.video_url).data
-          .publicUrl,
-        thumbnailUrl: v.thumbnail_url
-          ? supabase.storage.from("thumbnails").getPublicUrl(v.thumbnail_url)
-              .data.publicUrl
-          : "/default-thumbnail.jpg",
-      }));
-      console.log("Fetched videos:", formatted);
+      const formatted = data.map((video) => {
+        const isLiveCategory = video.category === "Live";
+        const isCurrentlyLive =
+          video.stream_status === "live" || video.stream_status === "active";
+        const videoUrlFromDB = video.video_url || "";
 
+        // --- VIDEO URL LOGIC ---
+        let finalVideoUrl = "";
+        if (videoUrlFromDB.includes("https://")) {
+          // Already full URL
+          finalVideoUrl = videoUrlFromDB;
+        } else if (isLiveCategory) {
+          // Live videos
+          if (isCurrentlyLive) {
+            finalVideoUrl = `https://livepeercdn.studio/hls/${videoUrlFromDB}/index.m3u8`;
+          } else {
+            // Archive / Finished fallback
+            finalVideoUrl = `https://vod-cdn.lp-playback.studio/hls/${videoUrlFromDB}/index.m3u8`;
+          }
+        } else {
+          // Normal video
+          finalVideoUrl = supabase.storage
+            .from("video")
+            .getPublicUrl(videoUrlFromDB).data.publicUrl;
+        }
+
+        // --- THUMBNAIL LOGIC ---
+        let finalThumbnailUrl = "/live_placeholder.png"; // Default placeholder
+
+        const isLivepeerVideo =
+          video.category === "Live" || video.category === "Archive";
+
+        if (isLivepeerVideo) {
+          // Live or Archive
+          if (video.thumbnail_url && video.thumbnail_url.startsWith("http")) {
+            finalThumbnailUrl = video.thumbnail_url + `?t=${Date.now()}`;
+          } else if (video.video_url && video.video_url.length > 10) {
+            finalThumbnailUrl = `https://vod-cdn.lp-playback.studio/hls/${video.video_url}/thumbnails/keyframes_0.jpg?cb=${Date.now()}`;
+          }
+        } else if (video.thumbnail_url) {
+          // Normal videos
+          finalThumbnailUrl = video.thumbnail_url.startsWith("http")
+            ? video.thumbnail_url
+            : supabase.storage
+                .from("thumbnails")
+                .getPublicUrl(video.thumbnail_url).data.publicUrl +
+              `?cb=${Date.now()}`;
+        }
+
+        return {
+          ...video,
+          videoUrl: finalVideoUrl,
+          thumbnailUrl: finalThumbnailUrl,
+          duration: isLiveCategory
+            ? isCurrentlyLive
+              ? "LIVE"
+              : "REC"
+            : video.duration || "00:00",
+          viewsCount: video.views && video.views[0] ? video.views[0].count : 0,
+        };
+      });
+
+      console.log("Fetched videos:", formatted);
       setVideos(formatted);
     }
+
     setLoading(false);
   };
 

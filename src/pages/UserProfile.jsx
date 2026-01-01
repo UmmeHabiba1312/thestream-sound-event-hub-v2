@@ -9,6 +9,7 @@ import { UserProfileHome } from "./UserProfileHome";
 import { UserProfileAbout } from "./UserProfileAbout";
 import { UserProfileVideos } from "./UserProfileVideos";
 import { UserProfileMusic } from "./UserProfileMusic";
+import { AlertTriangle } from "lucide-react";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -25,7 +26,7 @@ const UserProfile = () => {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("*")
+        .select("*, warning_count, warning_reasons, banned, ban_reason")
         .eq("id", authUser.user.id)
         .single();
 
@@ -112,6 +113,49 @@ const UserProfile = () => {
           <input type="file" hidden onChange={handleBannerUpload} />
         </label>
       </div>
+      {user?.banned ? (
+        <div className="bg-red-900 text-white p-8 rounded-xl text-center my-12 max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold mb-4">
+            Account Permanently Banned
+          </h2>
+          <p className="text-xl mb-6">
+            Your account has been suspended due to repeated violations of
+            community guidelines.
+          </p>
+          {user.ban_reason && (
+            <p className="text-lg italic mb-4">Reason: {user.ban_reason}</p>
+          )}
+          <p className="text-lg">
+            Contact support if you believe this is a mistake.
+          </p>
+        </div>
+      ) : user?.warning_count > 0 ? (
+        <div className="bg-orange-900 border-2 border-orange-500 text-white p-8 rounded-xl my-12 max-w-4xl mx-auto">
+          <h3 className="text-3xl font-bold flex items-center justify-center gap-4 mb-6">
+            <AlertTriangle size={36} />
+            Account Warning ({user.warning_count}/3)
+          </h3>
+          <p className="text-xl text-center mb-6">
+            You have received {user.warning_count} warning(s). After 3 warnings,
+            your account will be permanently banned.
+          </p>
+          <div className="bg-orange-800 p-6 rounded-lg">
+            <p className="font-bold text-lg mb-3">Warning Reasons:</p>
+            <ul className="list-disc list-inside space-y-2 text-lg">
+              {user.warning_reasons?.length > 0 ? (
+                user.warning_reasons.map((reason, i) => (
+                  <li key={i}>{reason}</li>
+                ))
+              ) : (
+                <li>No specific reason provided</li>
+              )}
+            </ul>
+          </div>
+          <p className="text-center mt-6 text-lg">
+            Please follow community guidelines to avoid permanent suspension.
+          </p>
+        </div>
+      ) : null}
 
       {/* Profile */}
       <div className="profile-section">

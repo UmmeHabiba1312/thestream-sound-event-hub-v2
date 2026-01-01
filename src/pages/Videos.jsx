@@ -5,7 +5,7 @@ import VideoCard from "../components/video/VideoCard";
 import { supabase } from "../lib/supabase";
 import { Upload, Plus, Radio } from "lucide-react"; // <--- Radio Icon Added
 import "./Videos.css";
-
+import { useNavigate } from "react-router-dom";
 const Videos = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -18,7 +18,7 @@ const Videos = () => {
   const [streamKey, setStreamKey] = useState(null);
   const [rtmpUrl, setRtmpUrl] = useState("rtmp://rtmp.livepeer.studio/live");
   const [playbackId, setPlaybackId] = useState(null);
-
+  const navigate = useNavigate();
   const [videoFile, setVideoFile] = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [title, setTitle] = useState("");
@@ -35,8 +35,7 @@ const Videos = () => {
   const [likedLoading, setLikedLoading] = useState(false);
   const [trendingVideos, setTrendingVideos] = useState([]);
   const [trendingLoading, setTrendingLoading] = useState(false);
-  
-
+  const [isBanned, setIsBanned] = useState(false);
   const [currentUserInfo, setCurrentUserInfo] = useState({
     fullName: "You",
     avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=You",
@@ -114,6 +113,11 @@ const Videos = () => {
       setCurrentUserInfo({ fullName: displayName, avatarUrl, userId: user.id });
     };
     fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(fetchVideos, 10000); // Every 10s refresh for live thumbnails
+    return () => clearInterval(interval);
   }, []);
 
   const getVideoDuration = (file) => {
@@ -321,6 +325,36 @@ const Videos = () => {
       fetchTrendingVideos();
     }
   }, [activeCategory]);
+
+  // === BANNED USER CHECK - UPLOAD PAGE PAR ===
+  useEffect(() => {
+    const checkIfBanned = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("banned")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Error checking ban status:", error);
+        return;
+      }
+
+      if (profile?.banned) {
+        alert(
+          "Your account is permanently banned. You cannot upload videos or go live.",
+        );
+        navigate("/profile"); // Ab navigate defined hai
+      }
+    };
+
+    checkIfBanned();
+  }, [navigate]);
 
   const filteredVideos =
     activeCategory === "all"
@@ -549,6 +583,10 @@ const Videos = () => {
   };
   // --- Functions to open Modal ---
   const openUploadModal = async () => {
+    if (isBanned) {
+      alert("Banned accounts cannot upload videos.");
+      return;
+    }
     if (!currentUserInfo.userId) {
       alert("Please log in to upload.");
       return;
@@ -568,6 +606,10 @@ const Videos = () => {
   };
 
   const openLiveModal = async () => {
+    if (isBanned) {
+      alert("Banned accounts cannot upload videos.");
+      return;
+    }
     if (!currentUserInfo.userId) {
       alert("Please log in to start a stream.");
       return;
@@ -679,9 +721,6 @@ const Videos = () => {
       if (category === "Live") {
         if (!streamKey || !playbackId)
           throw new Error("LivePeer assets not created.");
-
-        const autoLiveThumbnail = `https://livepeercdn.studio/hls/${playbackId}/thumbnails/default.jpg`;
-
         const { data, error } = await supabase
           .from("videos")
           .insert({
@@ -690,7 +729,7 @@ const Videos = () => {
             category: "Live",
             video_url: playbackId,
             stream_id: activeStreamId,
-            thumbnail_url: thumbnailFile ? null : autoLiveThumbnail,
+            thumbnail_url: null,
             uploaded_by: user.id,
             uploader_ip: userIp,
             status: "approved",
@@ -700,7 +739,6 @@ const Videos = () => {
           })
           .select()
           .single();
-
         if (error) throw error;
         insertedRecord = data;
         alert("Stream is Live!");
@@ -853,12 +891,16 @@ const Videos = () => {
                 <Plus size={20} style={{ marginRight: 5 }} /> Add Video Manually
               </button>
             )}
-            <button className="live-btn" onClick={openLiveModal}>
-              <Radio size={20} /> Go Live
-            </button>
-            <button className="upload-btn" onClick={openUploadModal}>
-              <Plus size={20} /> Upload Video
-            </button>
+            {!isBanned && (
+              <div style={{ display: "flex", gap: "12px" }}>
+                <button className="live-btn" onClick={openLiveModal}>
+                  <Radio size={20} /> Go Live
+                </button>
+                <button className="upload-btn" onClick={openUploadModal}>
+                  <Plus size={20} /> Upload Video
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -891,35 +933,33 @@ const Videos = () => {
                 .getPublicUrl(videoUrlFromDB).data.publicUrl;
             }
 
-            // ==========================================
-            // 2. ✅ UPDATED THUMBNAIL URL LOGIC
             let finalThumbnailUrl = "/live_placeholder.png";
 
-            if (video.thumbnail_url) {
-              // Agar DB mein link mojood hai (Live start ya Recording ready dono cases mein)
-              if (video.thumbnail_url.startsWith("http")) {
+            const isLivepeerVideo =
+              video.category === "Live" || video.category === "Archive";
+
+            if (isLivepeerVideo) {
+              // Live ke dauran DB ka live preview URL use karo (tumhare logs se yeh kaam kar raha hai)
+              if (
+                video.thumbnail_url &&
+                video.thumbnail_url.startsWith("http")
+              ) {
                 finalThumbnailUrl = video.thumbnail_url;
-              } else {
-                // Normal uploaded videos ke liye storage path
-                const fullPath = video.thumbnail_url.includes(
-                  "videos_thumbnail/",
-                )
-                  ? video.thumbnail_url
-                  : `videos_thumbnail/${video.thumbnail_url}`;
-                finalThumbnailUrl = supabase.storage
-                  .from("thumbnails")
-                  .getPublicUrl(fullPath).data.publicUrl;
+                finalThumbnailUrl += `?t=${Date.now()}`; // Fast update
               }
-            } else if (isLiveCategory) {
-              // Agar DB khali ho toh foran auto-construct karein
-              if (videoUrlFromDB.includes("https://")) {
-                finalThumbnailUrl = videoUrlFromDB.replace(
-                  "index.m3u8",
-                  "thumbnails/default.jpg",
-                );
-              } else {
-                finalThumbnailUrl = `https://livepeercdn.studio/hls/${videoUrlFromDB}/thumbnails/default.jpg`;
+              // Archive mein keyframes try karo
+              else if (video.video_url && video.video_url.length > 10) {
+                finalThumbnailUrl = `https://vod-cdn.lp-playback.studio/hls/${video.video_url}/thumbnails/keyframes_0.jpg`;
+                finalThumbnailUrl += `?cb=${Date.now()}`;
               }
+            } else if (video.thumbnail_url) {
+              // Normal videos
+              finalThumbnailUrl = video.thumbnail_url.startsWith("http")
+                ? video.thumbnail_url
+                : supabase.storage
+                    .from("thumbnails")
+                    .getPublicUrl(video.thumbnail_url).data.publicUrl;
+              finalThumbnailUrl += `?cb=${Date.now()}`;
             }
             return (
               <VideoCard

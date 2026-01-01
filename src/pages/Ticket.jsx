@@ -13,7 +13,6 @@ const Ticket = ({
   return (
     <div className="ticket-wrapper">
       <div className="ticket-card">
-
         {/* Header */}
         <div className="ticket-header">
           <h2 className="logo">skiddle</h2>
@@ -46,7 +45,6 @@ const Ticket = ({
           <img src={qrCode} alt="QR Code" />
           <p className="ticket-id">{ticketId}</p>
         </div>
-
       </div>
     </div>
   );
