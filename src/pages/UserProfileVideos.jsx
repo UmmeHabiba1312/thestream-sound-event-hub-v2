@@ -161,58 +161,67 @@ export const UserProfileVideos = ({ userId }) => {
   if (videos.length === 0)
     return <p className="text-gray-500">No videos uploaded yet.</p>;
 
-  return (
-    <div className="profile-videos-grid">
+return (
+  <div className="container-fluid">
+    <div className="row g-4">
       {videos.map((video) => (
         <div
           key={video.id}
-          className="video-item-wrapper"
-          style={{ position: "relative" }}
+          className="col-12 col-sm-6 col-md-4"
         >
-          {/* Reuse existing VideoCard */}
-          <VideoCard video={video} />
-
-          {/* Action Buttons Overlay */}
           <div
-            className="video-actions-overlay"
-            style={{
-              display: "flex",
-              gap: "10px",
-              marginTop: "10px",
-              justifyContent: "flex-end",
-            }}
+            className="video-item-wrapper"
+            style={{ position: "relative" }}
           >
-            <button
-              onClick={() => handleEdit(video.id, video.title)}
+            {/* Video Card */}
+            <VideoCard video={video} />
+
+            {/* Action Buttons */}
+            <div
+              className="video-actions-overlay"
               style={{
-                background: "#333",
-                border: "none",
-                padding: "8px",
-                borderRadius: "50%",
-                cursor: "pointer",
-                color: "white",
+                display: "flex",
+                gap: "10px",
+                marginTop: "10px",
+                justifyContent: "flex-end",
               }}
-              title="Edit Title"
             >
-              <Edit2 size={16} />
-            </button>
-            <button
-              onClick={() => handleDelete(video)}
-              style={{
-                background: "#ef4444",
-                border: "none",
-                padding: "8px",
-                borderRadius: "50%",
-                cursor: "pointer",
-                color: "white",
-              }}
-              title="Delete Video"
-            >
-              <Trash2 size={16} />
-            </button>
+              <button
+                onClick={() => handleEdit(video.id, video.title)}
+                style={{
+                  background: "#333",
+                  border: "none",
+                  padding: "4px 10px",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  color: "white",
+                }}
+                title="Edit Title"
+              >
+                <Edit2 size={16} />
+              </button>
+
+              <button
+                onClick={() => handleDelete(video)}
+                style={{
+                  background: "#ef4444",
+                  border: "none",
+                  padding: "4px 10px",
+                  alignItems:"center",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  color: "white",
+                }}
+                title="Delete Video"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
           </div>
         </div>
       ))}
     </div>
-  );
+  </div>
+);
+
 };

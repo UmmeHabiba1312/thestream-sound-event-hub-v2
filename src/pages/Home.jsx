@@ -2,8 +2,26 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Video, Music, Calendar, TrendingUp, Sparkles } from 'lucide-react';
 import './Home.css';
+import { motion } from "framer-motion";
+import gsap from "gsap";
 
 const Home = () => {
+const wordsArray = "Dive into the future of entertainment. Stream your favorite shows, catch live concerts, and discover music that moves you.".split(" ");
+const [words, setWords] = React.useState([wordsArray[0]]); // first word visible
+
+React.useEffect(() => {
+  let index = 1;
+  const interval = setInterval(() => {
+    if (index < wordsArray.length) {
+      setWords(wordsArray.slice(0, index + 1));
+      index++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 120); // premium typing speed
+  return () => clearInterval(interval);
+}, []);
+
   const features = [
     {
       icon: Video,
@@ -32,29 +50,75 @@ const Home = () => {
     <div className="home-page">
       {/* Hero Section */}
       <section className="hero-section">
+         <div className="hero-bg-overlay"></div>
         <div className="hero-content animate-slide-in">
           <div className="hero-badge">
             <Sparkles size={16} />
             <span>Premium Entertainment Platform</span>
           </div>
-          <h1 className="hero-title">
-            Experience Entertainment
-            <span className="text-gradient"> Like Never Before</span>
-          </h1>
-          <p className="hero-description">
-            Stream videos, discover music, and book event tickets all in one place.
-            Join millions of users enjoying premium content.
-          </p>
-          <div className="hero-actions">
-            <Link to="/videos" className="hero-btn primary">
-              <Video size={20} />
-              Start Watching
-            </Link>
-            <Link to="/music" className="hero-btn secondary">
-              <Music size={20} />
-              Explore Music
-            </Link>
-          </div>
+       
+{/* =====  Hero Section Start ===== */}
+        <div className="premium-hero-wrapper">
+
+          {/* Cinematic Heading */}
+        <motion.h1
+          className="premium-hero-title"
+          initial={{ opacity: 0, y: 50 }}      // start slightly below
+          animate={{ opacity: 1, y: 0 }}       // slide up into position
+          transition={{
+            duration: 1.5,                     // smooth fade & slide
+            ease: "easeOut",
+          }}
+        >
+          Experience <span className="glow-word">Music.</span>
+          <br />
+          Live <span className="glow-word">Events.</span>
+          <br />
+          Endless <span className="glow-word">Streaming.</span>
+        </motion.h1>
+
+          {/* Premium Typing Paragraph */}
+          <motion.p
+            className="premium-typewriter"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: {
+                transition: { staggerChildren: 0.15 }
+              }
+            }}
+          >
+            {words.map((word, i) => (
+              <motion.span
+          key={i}
+          className="premium-desc-word"
+          style={{ display: 'inline-block', verticalAlign: 'top' }} // <-- important
+          variants={{
+            hidden: { opacity: 0, y: 0 },   // remove vertical shift
+            visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+          }}
+        >
+          {word}&nbsp;
+        </motion.span>
+
+            ))}
+          </motion.p>
+        </div>
+{/* ===== Hero Section End ===== */}
+
+
+     <div className="hero-actions">
+  <Link to="/videos" className="hero-btn hero-btn-watch">
+    <Video size={20} />
+    Start Watching
+  </Link>
+  <Link to="/music" className="hero-btn hero-btn-music">
+    <Music size={20} />
+    Explore Music
+  </Link>
+</div>
+
         </div>
         <div className="hero-visual animate-float">
           <div className="visual-orb orb-1"></div>

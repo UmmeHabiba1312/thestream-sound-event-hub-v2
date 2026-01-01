@@ -275,3 +275,11 @@
     background: #000;
     border-radius: 8px;
 }
+.video-thumbnail {
+  width: 100%;
+  height: auto;         
+  max-height: 250px;     
+  object-fit: contain;  
+  background: #000;    
+  border-radius: 8px;
+}

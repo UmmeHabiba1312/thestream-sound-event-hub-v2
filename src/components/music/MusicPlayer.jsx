@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import "./MusicPlayer.css";
 
-const MusicPlayer = ({ currentTrack, onNext, onPrev }) => {
+const MusicPlayer = ({ currentTrack, onNext, onPrev, onClose }) => {
   const audioRef = useRef(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -15,6 +15,20 @@ const MusicPlayer = ({ currentTrack, onNext, onPrev }) => {
   const [volume, setVolume] = useState(75);
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
+
+const [isClosing, setIsClosing] = useState(false);
+
+const handleClose = () => {
+  if (audioRef.current) {
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+  }
+  setIsClosing(true); // start fade-out
+  setTimeout(() => {
+    onClose(); // actually unmount
+  }, 300); // match transition duration
+};
+
 
   // --- 1. Load Track & Play ---
   useEffect(() => {
@@ -99,6 +113,7 @@ const MusicPlayer = ({ currentTrack, onNext, onPrev }) => {
       </audio>
 
       <div className="player-content">
+         
         {/* Track Info */}
         <div className="player-track-info">
           <img src={currentTrack.albumArt} alt={currentTrack.title} className="player-album-art" />
@@ -106,6 +121,21 @@ const MusicPlayer = ({ currentTrack, onNext, onPrev }) => {
             <h4 className="player-title">{currentTrack.title}</h4>
             <p className="player-artist">{currentTrack.artist}</p>
           </div>
+<button
+  className="player-close-btn"
+  onClick={() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    onClose(); // parent will set currentTrack to null
+  }}
+>
+  ×
+</button>
+
+
+
         </div>
 
         {/* Controls */}

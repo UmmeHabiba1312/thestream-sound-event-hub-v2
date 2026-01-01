@@ -129,7 +129,7 @@
 
 /* ---------- SCROLLBAR ---------- */
 .video-sidebar::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 .video-sidebar::-webkit-scrollbar-thumb {

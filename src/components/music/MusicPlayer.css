@@ -204,3 +204,23 @@
     display: none;
   }
 }
+.player-close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
+}
+
+.music-player {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.music-player.hide {
+  opacity: 0;
+  transform: translateY(20px);
+}
+

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 // 1. FIXED: Added missing icon imports
+
 import { Check, Zap, Music, Video, Radio } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
+
 import "./Subscription.css";
 
 const Subscription = () => {
@@ -13,6 +15,7 @@ const Subscription = () => {
   const [videoCount, setVideoCount] = useState(5);
   const [addStreaming, setAddStreaming] = useState(false);
   const [streamingHours, setStreamingHours] = useState(10);
+
   const [processingPlan, setProcessingPlan] = useState(null);
   const RATE_MUSIC = 2;
   const RATE_VIDEO = 5;
@@ -31,9 +34,7 @@ const Subscription = () => {
   const { data: userSubscription, isLoading } = useQuery({
     queryKey: ["userSubscription"],
     queryFn: async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not logged in");
       const { data, error } = await supabase
         .from("profiles")
@@ -56,9 +57,7 @@ const Subscription = () => {
       return;
     }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       alert("Please log in to change your subscription.");
       return;
@@ -66,6 +65,7 @@ const Subscription = () => {
 
     if (planId === "free") {
       alert("Switching to Free plan...");
+
       await supabase
         .from("profiles")
         .update({ subscription_plan: "free", subscription_expires_at: null })
@@ -76,6 +76,7 @@ const Subscription = () => {
 
     setProcessingPlan(planId);
 
+
     try {
       const { data, error } = await supabase.functions.invoke(
         "stripe-checkout",
@@ -83,7 +84,9 @@ const Subscription = () => {
           body: {
             plan_id: planId, // yahan "custom_bundle" jayega
             userId: user.id,
+
             // 🎯 Ye teen cheezain Stripe ko batani hain taake wo DB mein add ho saken
+
             music_tracks: customData?.music || 0,
             video_uploads: customData?.videos || 0,
             streaming_hours: customData?.streaming || 0,
@@ -104,11 +107,14 @@ const Subscription = () => {
       console.error("Stripe Checkout Error:", err);
       alert(`Payment initialization failed: ${err.message}`);
     } finally {
+
       setProcessingPlan(null);
+
     }
   };
 
   const plans = [
+
     {
       id: "free",
       name: "Free",
@@ -147,6 +153,7 @@ const Subscription = () => {
       buttonText: "Go Premium",
       popular: false,
     },
+
   ];
 
   if (isLoading) return <div>Loading subscription...</div>;
@@ -155,6 +162,7 @@ const Subscription = () => {
   return (
     <div className="subscription-page">
       <div className="subscription-header">
+
         <h1 className="subscription-title">
           Choose Your <span className="text-gradient">Perfect Plan</span>
         </h1>
@@ -166,10 +174,12 @@ const Subscription = () => {
           Current Plan:{" "}
           {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
         </p>
+
       </div>
 
       <div className="plans-container">
         {plans.map((plan) => (
+
           <div
             key={plan.id}
             className={`plan-card ${plan.popular ? "popular" : ""} ${plan.id === currentPlan ? "current" : ""}`}
@@ -182,22 +192,18 @@ const Subscription = () => {
             {plan.id === currentPlan && (
               <div className="current-badge">Current Plan</div>
             )}
+
             <div className="plan-header">
               <h3 className="plan-name">{plan.name}</h3>
-              <div className="plan-price">
-                <span className="price-amount">{plan.price}</span>
-                <span className="price-period">/{plan.period}</span>
-              </div>
+              <div className="plan-price"><span className="price-amount">{plan.price}</span><span className="price-period">/{plan.period}</span></div>
               <p className="plan-uploads">{plan.uploads}</p>
             </div>
             <ul className="plan-features">
               {plan.features.map((feature, index) => (
-                <li key={index} className="feature-item">
-                  <Check className="check-icon" size={20} />
-                  <span>{feature}</span>
-                </li>
+                <li key={index} className="feature-item"><Check className="check-icon" size={20} /><span>{feature}</span></li>
               ))}
             </ul>
+
             <button
               className={`plan-button ${plan.popular ? "premium" : ""}`}
               onClick={() => handleSubscribe(plan.id)}
@@ -299,12 +305,14 @@ const Subscription = () => {
                   <div className="count-display">
                     {streamingHours} hours selected
                   </div>
+
                 </>
               )}
             </div>
           </div>
           <button
             className="plan-button premium"
+
             onClick={() =>
               handleSubscribe("custom_bundle", {
                 music: addMusic ? musicCount : 0,
@@ -320,6 +328,7 @@ const Subscription = () => {
             {processingPlan === "custom_bundle"
               ? "Processing..."
               : "Purchase Bundle"}
+
           </button>
         </div>
       </div>

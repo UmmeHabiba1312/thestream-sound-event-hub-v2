@@ -103,7 +103,6 @@ const MusicCard = ({ track, onPlay, onPurchase, isOwned = false }) => {
           });
 
         if (!insertError) {
-          // ✅ Ab sirf tabhi badhega jab DB mein nayi row banegi
           setViewsCount((prev) => prev + 1);
         } else {
           console.error("Insert view error:", insertError);

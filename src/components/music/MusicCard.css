@@ -120,7 +120,7 @@
 
 .like-btn {
   background-color: var(--secondary);
-  color: var(--foreground);
+  color: var(--primary);
   border: 1px solid var(--border);
 }
 

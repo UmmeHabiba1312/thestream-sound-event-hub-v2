@@ -36,6 +36,9 @@
   margin-bottom: 1.5rem;
   animation: pulse-glow 2s ease-in-out infinite;
 }
+.hero-badge span{
+  font-size: 10px;
+}
 
 .hero-title {
   font-size: 2.25rem;
@@ -77,6 +80,7 @@
   flex-direction: column;
   gap: 1rem;
   justify-content: center;
+  padding-top: 20px;
 }
 
 @media (min-width: 640px) {
@@ -296,6 +300,81 @@
 .feature-card:hover .feature-arrow {
   transform: translateX(8px);
 }
+/* 1. Define the rotation for the gradient */
+@keyframes border-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.feature-card {
+  position: relative;
+  padding: 2rem;
+  border-radius: 1rem;
+  background-color: var(--card); /* Inner background color */
+  text-decoration: none;
+  overflow: hidden; /* Clips the rotating background */
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+  z-index: 1;
+  border: 1px solid var(--border); /* Default border */
+}
+
+/* 2. The Animated Border Layer */
+.feature-card::before {
+  content: '';
+  position: absolute;
+  /* Make it larger than the card so it covers corners when rotating */
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  /* Your specific red/coral gradient */
+  background: conic-gradient(
+    transparent,
+    #dc2626,
+    #f87171,
+    transparent 30%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -2;
+}
+
+/* 3. The "Mask" to keep the center of the card solid */
+.feature-card::after {
+  content: '';
+  position: absolute;
+  /* This creates a 1px gap to show the border */
+  inset: 1px; 
+  background: var(--card); 
+  border-radius: calc(1rem - 1px);
+  z-index: -1;
+}
+
+/* 4. Hover State: Start the border movement */
+.feature-card:hover {
+  border-color: transparent; /* Hide the static border */
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px -10px rgba(220, 38, 38, 0.3);
+}
+
+.feature-card::before {
+  opacity: 1;
+  animation: border-rotate 4s linear infinite;
+}
+
+/* 5. Ensure existing class content stays visible */
+.feature-icon-wrapper, 
+.feature-title, 
+.feature-description, 
+.feature-arrow {
+  position: relative;
+  z-index: 10;
+}
 
 /* Stats Section */
 .stats-section {
@@ -355,3 +434,170 @@
     gap: 1.5rem;
   }
 }
+
+
+.premium-hero-wrapper {
+  text-align: center;
+  margin-top: 60px;
+}
+
+.premium-hero-title {
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: 1px;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+.glow-word {
+  color: white;
+  text-shadow: 0 0 15px rgba(255,40,40,0.9),
+               0 0 30px rgba(255,20,20,0.7),
+               0 0 45px rgba(255,0,0,0.6);
+  animation: glowPulse 2s infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% {
+    text-shadow: 0 0 8px rgba(255,20,20,0.4),
+                 0 0 18px rgba(255,20,20,0.3);
+  }
+  100% {
+    text-shadow: 0 0 25px rgba(255,20,20,0.9),
+                 0 0 45px rgba(255,0,0,0.7);
+  }
+}
+
+.premium-typewriter {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #ffffffcc;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.8;
+  letter-spacing: 0.5px;
+  margin-top: 15px;
+  height: 6.5rem; 
+  overflow: hidden;
+}
+
+
+.premium-desc-word {
+  display: inline-block;
+}
+
+
+.glow-word {
+  color: #ff2d2d;
+  text-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+  font-weight: 700;
+}
+
+.hero-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 3px solid transparent;
+  border-radius: 50px;
+  color: #fff;
+  text-decoration: none;
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 0;
+  transition: color 0.3s;
+}
+
+/* Outline with moving gradient */
+.hero-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 3px; /* outline thickness */
+  border-radius: 50px;
+  background: linear-gradient(90deg, #ff2d2d, #ff7a00, #ff2d2d, #ff00d4);
+  background-size: 200% 200%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: -1;
+  animation: borderGradient 3s linear infinite;
+  transition: background 0.3s;
+}
+
+/* Hover: fill with gradient inside */
+.hero-btn:hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50px;
+  background: linear-gradient(90deg, #ff2d2d, #ff7a00, #ff2d2d, #ff00d4);
+  z-index: -2;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Optional: fade effect for outline + fill */
+.hero-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50px;
+  opacity: 0;
+  z-index: -2;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Keyframes for moving gradient outline */
+@keyframes borderGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Hover text color inversion */
+.hero-btn:hover {
+  color: #000;
+}
+
+
+@media (max-width: 768px) {
+  .premium-hero-title {
+    font-size: 2rem; 
+    line-height: 1.2;
+  }
+
+  .premium-typewriter {
+    font-size: 1rem; 
+    line-height: 1.5;
+    height: auto; 
+  }
+  .hero-section {
+    padding: 3rem 1rem;
+  }
+  .glow-word {
+    font-size: 1.8rem;
+  }
+}
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  padding: 5rem 1rem;
+  /* background: url('/assets/logo.jpeg') center/contain no-repeat; */
+}
+
+.hero-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0,0,0,0.8); /* adjust 0.1 - 0.7 for opacity */
+  z-index: 1;
+}
+

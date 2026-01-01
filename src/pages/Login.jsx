@@ -114,8 +114,8 @@ const Login = () => {
       <div className="login-container">
         <div className="login-card">
           <div className="login-logo">
-            <div className="logo-icon-large">
-              <Video className="logo-video-large" />
+            <div className="logo-icon-large">            
+           <img src="/assets/logo.jpeg" alt="logo" className="logo-image" />
             </div>
             <h1 className="logo-text-large">StreamHub</h1>
             <p className="logo-subtitle">
