@@ -436,31 +436,54 @@ const Events = () => {
   return (
     <div className="events-page">
       {/* Ad Banner Section */}
+      {/* Ad Banner Section – now using real events */}
       <section className="ad-banner-section">
         <div className="ad-carousel">
-          <button className="carousel-btn prev" onClick={prevAd}>
+          <button
+            className="carousel-btn prev"
+            onClick={() =>
+              setCurrentAdIndex(
+                (prev) => (prev - 1 + events.length) % events.length,
+              )
+            }
+          >
             <ChevronLeft size={24} />
           </button>
-          <div className="ad-banner animate-fade-in" key={currentAdIndex}>
-            <img
-              src={featuredAds[currentAdIndex].image}
-              alt={featuredAds[currentAdIndex].title}
-              className="ad-image"
-            />
-            <div className="ad-content">
-              <h2 className="ad-title">{featuredAds[currentAdIndex].title}</h2>
-              <p className="ad-sponsor">
-                Sponsored by {featuredAds[currentAdIndex].sponsor}
-              </p>
-              <button className="ad-btn">Learn More</button>
+
+          {events.length > 0 ? (
+            <div className="ad-banner animate-fade-in" key={currentAdIndex}>
+              <img
+                src={events[currentAdIndex].poster}
+                alt={events[currentAdIndex].title}
+                className="ad-image"
+              />
+              <div className="ad-content">
+                <h2 className="ad-title">{events[currentAdIndex].title}</h2>
+                <p className="ad-sponsor">{events[currentAdIndex].venue}</p>
+                <button
+                  className="ad-btn"
+                  onClick={() => handleViewDetails(events[currentAdIndex])}
+                >
+                  View Details
+                </button>
+              </div>
             </div>
-          </div>
-          <button className="carousel-btn next" onClick={nextAd}>
+          ) : (
+            <p className="text-gray-400">No upcoming events</p>
+          )}
+
+          <button
+            className="carousel-btn next"
+            onClick={() =>
+              setCurrentAdIndex((prev) => (prev + 1) % events.length)
+            }
+          >
             <ChevronRight size={24} />
           </button>
         </div>
+
         <div className="ad-indicators">
-          {featuredAds.map((_, index) => (
+          {events.map((_, index) => (
             <button
               key={index}
               className={`indicator ${index === currentAdIndex ? "active" : ""}`}
