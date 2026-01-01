@@ -7,9 +7,8 @@ import {
   Calendar,
   Menu,
   X,
-  Search,
+  // Search,
   Bell,
-  User,
   Zap,
   LogOut,
   Clock,
@@ -39,16 +38,16 @@ const formatRelativeTime = (dateString) => {
 const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false); // New
-  const [notifications, setNotifications] = useState([]); // New
-  const [unreadCount, setUnreadCount] = useState(0); // New
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [user, setUser] = useState({ name: "Guest", email: "", id: null });
   const [isAdmin, setIsAdmin] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const userMenuRef = useRef(null);
-  const notifRef = useRef(null); // New
+  const notifRef = useRef(null);
 
   // Example check for your Notifications component:
   useEffect(() => {
@@ -143,12 +142,7 @@ const Navigation = () => {
           filter: `user_id=eq.${user.id}`,
         },
         async (payload) => {
-          console.log("Nayi Notification Mili!", payload.new);
-
-          // Audio ya Alert add karein
-          // alert(`New Notification: ${payload.new.message}`);
-
-          // Poori list refresh karein taake naya data (actor profile ke saath) mil jaye
+          console.log("New Notification Received!", payload.new);
           await fetchNotifications();
         },
       )
@@ -166,7 +160,7 @@ const Navigation = () => {
 
   const markAsRead = async () => {
     if (unreadCount === 0) return;
-    setUnreadCount(0); // Optimistic UI update
+    setUnreadCount(0);
     await supabase
       .from("notifications")
       .update({ is_read: true })
@@ -197,7 +191,7 @@ const Navigation = () => {
         });
         setIsAdmin(
           profile?.role === "admin" ||
-            session.user.email === "admin@example.com",
+            session.user.email === "admin@example.com"
         );
       } else {
         setUser({ name: "Guest", email: "", id: null });
@@ -215,7 +209,7 @@ const Navigation = () => {
           setUser({ name: "Guest", email: "", id: null });
           setIsAdmin(false);
         }
-      },
+      }
     );
 
     return () => listener?.subscription.unsubscribe();
@@ -226,12 +220,13 @@ const Navigation = () => {
     navigate("/login");
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
+  // const handleSearch = (e) => {
+  //   e.preventDefault();
+  //   if (searchQuery.trim()) {
+  //     navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+  //   }
+  // };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
@@ -259,12 +254,12 @@ const Navigation = () => {
       <div className="nav-container">
         <Link to="/" className="nav-logo">
           <div className="logo-icon">
-            <Video className="logo-video" />
+            {/* <img src="/assets/logo.jpeg" alt="logo" className="logo-image" /> */}
           </div>
           <span className="logo-text">StreamHub</span>
         </Link>
 
-        <form className="nav-search" onSubmit={handleSearch}>
+        {/* <form className="nav-search" onSubmit={handleSearch}>
           <input
             type="text"
             placeholder="Search videos, music, events..."
@@ -275,7 +270,7 @@ const Navigation = () => {
           <button type="submit" className="search-btn">
             <Search size={20} />
           </button>
-        </form>
+        </form> */}
 
         <div className="nav-links">
           {navItems.map((item) => (
@@ -385,77 +380,86 @@ const Navigation = () => {
             )}
           </div>
 
-          <div className="user-menu-wrapper" ref={userMenuRef}>
-            <button
-              className="profile-circle-btn"
-              onClick={() => setShowUserMenu(!showUserMenu)}
-            >
-              {user?.avatar_url ? (
-                <img
-                  src={user.avatar_url}
-                  alt="User"
-                  className="profile-avatar-img"
-                />
-              ) : (
-                user?.name?.charAt(0).toUpperCase()
-              )}
-            </button>
+          <div className="nav-actions">
+            {/* <Link to="/subscription" className="upgrade-btn">
+              <Zap size={12} fill="currentColor" />
+              <span>Upgrade</span>
+            </Link> */}
 
-            {showUserMenu && (
-              <div className="user-dropdown">
-                <div className="user-info-block">
-                  <div className="user-info-avatar">
-                    {user?.avatar_url ? (
-                      <img
-                        src={user.avatar_url}
-                        alt="User"
-                        className="dropdown-avatar-img"
-                      />
-                    ) : (
-                      user?.name?.charAt(0).toUpperCase()
-                    )}
+          
+            <div className="user-menu-wrapper" ref={userMenuRef}>
+              <button
+                className="profile-circle-btn"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                {user?.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt="User"
+                    className="profile-avatar-img"
+                  />
+                ) : (
+                  user?.name?.charAt(0).toUpperCase()
+                )}
+              </button>
+
+              {showUserMenu && (
+                <div className="user-dropdown">
+                  <div className="user-info-block">
+                    <div className="user-info-avatar">
+                      {user?.avatar_url ? (
+                        <img
+                          src={user.avatar_url}
+                          alt="User"
+                          className="dropdown-avatar-img"
+                        />
+                      ) : (
+                        user?.name?.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div>
+                      <p className="user-info-name">{user?.name}</p>
+                      <p className="user-info-email">{user?.email}</p>
+                      <Link
+                        to="/profile"
+                        className="view-profile-link"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        View your channel
+                      </Link>
+                    </div>
                   </div>
-                  <div>
-                    <p className="user-info-name">{user?.name}</p>
-                    <p className="user-info-email">{user?.email}</p>
+                  <div className="dropdown-divider"></div>
+                  {isAdmin && (
                     <Link
-                      to="/profile"
-                      className="view-profile-link"
+                      to="/admin"
+                      className="dropdown-item"
                       onClick={() => setShowUserMenu(false)}
                     >
-                      View your channel
+                      <Zap size={16} /> <span>Admin Panel</span>
                     </Link>
-                  </div>
+                  )}
+                  {user.email && (
+                    <button
+                      className="dropdown-item logout-btn"
+                      onClick={handleLogout}
+                    >
+                      <LogOut size={16} /> <span>Sign Out</span>
+                    </button>
+                  )}
                 </div>
-                <div className="dropdown-divider"></div>
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    className="dropdown-item"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    <Zap size={16} /> <span>Admin Panel</span>
-                  </Link>
-                )}
-                {user.email && (
-                  <button
-                    className="dropdown-item logout-btn"
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={16} /> <span>Sign Out</span>
-                  </button>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        <button
-          className="mobile-menu-btn"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          {/* Mobile menu button on right */}
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {mobileMenuOpen && (

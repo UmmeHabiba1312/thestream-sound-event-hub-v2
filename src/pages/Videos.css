@@ -43,6 +43,7 @@
 .videos-subtitle {
     color: var(--muted-foreground);
     margin-top: 0.25rem;
+
 }
 
 /* BUTTONS */
@@ -82,6 +83,7 @@
 .live-btn:hover {
     background-color: #cc0000;
 }
+
 
 /* VIDEOS GRID */
 .videos-grid {
@@ -165,7 +167,6 @@
     opacity: 0;
     cursor: pointer;
 }
-
 .form-group {
     margin-bottom: 1rem;
 }
@@ -227,6 +228,7 @@
 .modal-btn.cancel:hover {
     border-color: var(--primary);
 }
+
 
 .modal-btn.submit {
     color: white;

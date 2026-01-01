@@ -81,6 +81,7 @@ const VideoSidebar = ({
  channel_id,
  profiles!channel_subscriptions_channel_id_fkey (full_name, avatar_url)
  `,
+
         )
         .eq("user_id", userId);
 
@@ -107,6 +108,7 @@ const VideoSidebar = ({
           setSubscriptions([]);
         }
       },
+
     );
 
     fetchData(null);
@@ -166,6 +168,7 @@ const VideoSidebar = ({
               {!collapsed && <span>Subscriptions</span>}
             </div>
 
+
             {loading ? (
               <p className="loading-text">{!collapsed && "Loading..."}</p>
             ) : subscriptions.length > 0 ? (
@@ -174,11 +177,10 @@ const VideoSidebar = ({
                   key={sub.id}
                   className="sidebar-item subscription-item"
                   onClick={() =>
-                    onCategoryChange(
-                      `channel_${sub.id}_${sub.name.replace(/\s+/g, "~")}`,
-                    )
+                    onCategoryChange(`channel_${sub.id}_${sub.name.replace(/\s+/g, "~")}`)
                   }
                 >
+
                   <img
                     src={sub.avatarUrl}
                     alt={sub.name}
@@ -188,9 +190,7 @@ const VideoSidebar = ({
                 </button>
               ))
             ) : (
-              <p className="empty-text">
-                {!collapsed && "No subscriptions yet"}
-              </p>
+              <p className="empty-text">{!collapsed && "No subscriptions yet"}</p>
             )}
             <hr />
           </>

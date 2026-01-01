@@ -1,14 +1,15 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import MusicCard from "../components/music/MusicCard";
+import MusicPlayer from "../components/music/MusicPlayer";
 import { Trash2, Edit2 } from "lucide-react";
 
 export const UserProfileMusic = ({ userId }) => {
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentTrack, setCurrentTrack] = useState(null);
-  const audioRef = useRef(null); // Single audio element for global playback
 
+  // ================= FETCH MUSIC =================
   const fetchMusic = async () => {
     setLoading(true);
     try {
@@ -29,12 +30,14 @@ export const UserProfileMusic = ({ userId }) => {
             artist: t.profiles?.full_name || "Unknown",
             price: t.price,
             albumArt: t.cover_path
-              ? supabase.storage.from("thumbnails").getPublicUrl(t.cover_path)
-                  .data.publicUrl
+              ? supabase.storage
+                  .from("thumbnails")
+                  .getPublicUrl(t.cover_path).data.publicUrl
               : "/default-thumbnail.jpg",
-            audioUrl: supabase.storage.from("content").getPublicUrl(t.file_path)
-              .data.publicUrl,
-          })),
+            audioUrl: supabase.storage
+              .from("content")
+              .getPublicUrl(t.file_path).data.publicUrl,
+          }))
         );
       }
     } catch (err) {
@@ -47,67 +50,67 @@ export const UserProfileMusic = ({ userId }) => {
     if (userId) fetchMusic();
   }, [userId]);
 
-  const handlePlayGlobal = (track) => {
+  // ================= PLAY =================
+  const handlePlay = (track) => {
     setCurrentTrack(track);
-    if (audioRef.current) {
-      audioRef.current.src = track.audioUrl;
-      audioRef.current.play();
+  };
+
+  // ================= NEXT / PREV =================
+  const handleNext = () => {
+    if (!currentTrack) return;
+    const index = tracks.findIndex((t) => t.id === currentTrack.id);
+    if (index < tracks.length - 1) {
+      setCurrentTrack(tracks[index + 1]);
     }
   };
 
+  const handlePrev = () => {
+    if (!currentTrack) return;
+    const index = tracks.findIndex((t) => t.id === currentTrack.id);
+    if (index > 0) {
+      setCurrentTrack(tracks[index - 1]);
+    }
+  };
+
+  // ================= DELETE =================
   const handleDelete = async (track) => {
     if (!window.confirm("Are you sure you want to delete this track?")) return;
 
     try {
-      const trackId = track.id;
-
-      // Delete storage files
-      if (track.file_path)
-        await supabase.storage.from("content").remove([track.file_path]);
-      if (track.cover_path)
-        await supabase.storage.from("thumbnails").remove([track.cover_path]);
-
-      // Delete DB row (cast ID to UUID)
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("content_uploads")
         .delete()
-        .eq("id::uuid", trackId)
-        .select();
+        .eq("id", track.id);
 
       if (error) throw error;
 
-      if (!data || data.length === 0) {
-        console.error("No row deleted! Maybe UUID mismatch?", trackId);
-        alert("Failed to delete track.");
-        return;
-      }
+      setTracks((prev) => prev.filter((t) => t.id !== track.id));
+      if (currentTrack?.id === track.id) setCurrentTrack(null);
 
-      // Re-fetch to update UI
-      await fetchMusic();
       alert("Track deleted successfully!");
     } catch (err) {
       console.error("Delete Error:", err);
-      alert("Failed to delete track. See console.");
+      alert("Failed to delete track.");
     }
   };
 
+  // ================= EDIT =================
   const handleEdit = async (track) => {
     const newTitle = prompt("Enter new title:", track.title);
-    if (newTitle === null) return;
-    const newPrice = prompt("Enter new price ($):", track.price);
-    if (newPrice === null) return;
+    if (!newTitle) return;
 
     try {
       const { error } = await supabase
         .from("content_uploads")
-        .update({ title: newTitle, price: parseFloat(newPrice) })
+        .update({ title: newTitle })
         .eq("id", track.id);
+
       if (error) throw error;
 
       setTracks((prev) =>
         prev.map((t) =>
-          t.id === track.id ? { ...t, title: newTitle, price: newPrice } : t,
-        ),
+          t.id === track.id ? { ...t, title: newTitle } : t
+        )
       );
     } catch (err) {
       console.error("Edit Error:", err);
@@ -120,10 +123,8 @@ export const UserProfileMusic = ({ userId }) => {
     return <p className="text-gray-500">No music uploaded yet.</p>;
 
   return (
-    <div>
-      {/* Hidden global audio player */}
-      <audio ref={audioRef} style={{ display: "none" }} controls />
-
+    <div style={{ paddingBottom: currentTrack ? "140px" : "0" }}>
+      {/* ================= MUSIC GRID ================= */}
       <div
         className="profile-music-grid"
         style={{
@@ -139,12 +140,10 @@ export const UserProfileMusic = ({ userId }) => {
               background: "#1e1e1e",
               borderRadius: "12px",
               padding: "15px",
-              position: "relative",
             }}
           >
-            <MusicCard track={track} onPlay={() => handlePlayGlobal(track)} />
+            <MusicCard track={track} onPlay={() => handlePlay(track)} />
 
-            {/* EDIT & DELETE BUTTONS */}
             <div
               style={{
                 display: "flex",
@@ -158,33 +157,24 @@ export const UserProfileMusic = ({ userId }) => {
               <button
                 onClick={() => handleEdit(track)}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
                   background: "#333",
                   border: "none",
                   color: "#fff",
-                  cursor: "pointer",
                   padding: "6px 12px",
                   borderRadius: "4px",
-                  fontSize: "13px",
                 }}
               >
                 <Edit2 size={14} /> Edit
               </button>
+
               <button
                 onClick={() => handleDelete(track)}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
                   background: "#ef4444",
                   border: "none",
                   color: "#fff",
-                  cursor: "pointer",
                   padding: "6px 12px",
                   borderRadius: "4px",
-                  fontSize: "13px",
                 }}
               >
                 <Trash2 size={14} /> Delete
@@ -193,6 +183,14 @@ export const UserProfileMusic = ({ userId }) => {
           </div>
         ))}
       </div>
+
+      {/* ================= EXISTING MUSIC PLAYER ================= */}
+      <MusicPlayer
+        currentTrack={currentTrack}
+        onNext={handleNext}
+        onPrev={handlePrev}
+        onClose={() => setCurrentTrack(null)}
+      />
     </div>
   );
 };

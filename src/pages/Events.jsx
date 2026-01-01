@@ -1,3 +1,4 @@
+
 import { supabase } from "../lib/supabase";
 import React, { useEffect, useState } from "react";
 import EventCard from "../components/events/EventCard";
@@ -12,6 +13,7 @@ import {
   QrCode,
 } from "lucide-react";
 import "./Events.css";
+
 
 const Events = () => {
   const navigate = useNavigate();
@@ -433,14 +435,34 @@ const Events = () => {
       (prev) => (prev - 1 + featuredAds.length) % featuredAds.length,
     );
 
+  const handleBuyTicket = () => {
+    if (!selectedEvent) return;
+
+    const ticketData = {
+      eventName: selectedEvent.title,
+      ticketType: selectedEvent.ticketPrice === 0 ? "Complimentary ticket" : "General Admission",
+      venue: selectedEvent.venue,
+      date: new Date(selectedEvent.date).toLocaleDateString(),
+      time: selectedEvent.time,
+      qrCode: "/qr.png",
+      ticketId: Math.floor(100000000000 + Math.random() * 900000000000),
+    };
+
+    setGeneratedTicket(ticketData);
+    setShowTicketModal(false);
+    setShowFinalTicket(true);
+  };
+
   return (
     <div className="events-page">
+
       {/* Ad Banner Section */}
       <section className="ad-banner-section">
         <div className="ad-carousel">
           <button className="carousel-btn prev" onClick={prevAd}>
             <ChevronLeft size={24} />
           </button>
+
           <div className="ad-banner animate-fade-in" key={currentAdIndex}>
             <img
               src={featuredAds[currentAdIndex].image}
@@ -455,10 +477,12 @@ const Events = () => {
               <button className="ad-btn">Learn More</button>
             </div>
           </div>
+
           <button className="carousel-btn next" onClick={nextAd}>
             <ChevronRight size={24} />
           </button>
         </div>
+
         <div className="ad-indicators">
           {featuredAds.map((_, index) => (
             <button
@@ -496,15 +520,16 @@ const Events = () => {
       </div>
 
       {/* Events Grid */}
-      <div className="events-grid">
-        {events.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            onViewDetails={handleViewDetails}
-          />
-        ))}
-      </div>
+    <div className="events-grid">
+  {events.map((event) => (
+    <EventCard
+      key={event.id}
+      event={event}
+      onViewDetails={handleViewDetails}
+    />
+  ))}
+</div>
+
 
       {/* Resale Marketplace */}
       <section className="resale-section">
@@ -526,6 +551,7 @@ const Events = () => {
             Refresh List
           </button>
         </div>
+
         <div className="resale-grid">
           {resaleTickets.length === 0 ? (
             <p className="text-center text-gray-400 col-span-full">
@@ -575,6 +601,7 @@ const Events = () => {
           )}
         </div>
       </section>
+
 
       {/* Create Event Modal */}
       {showCreateModal && (
@@ -704,12 +731,14 @@ const Events = () => {
                 Create Event
               </button>
             </div>
+
           </div>
         </div>
       )}
 
       {/* Ticket Purchase Modal */}
       {showTicketModal && selectedEvent && (
+
         <div
           className="modal-overlay"
           onClick={() => setShowTicketModal(false)}
@@ -718,11 +747,13 @@ const Events = () => {
             className="modal-content ticket-modal"
             onClick={(e) => e.stopPropagation()}
           >
+
             <img
               src={selectedEvent.poster}
               alt={selectedEvent.title}
               className="ticket-poster"
             />
+
             <h2 className="modal-title">{selectedEvent.title}</h2>
             <p className="ticket-description">{selectedEvent.description}</p>
 
@@ -730,14 +761,15 @@ const Events = () => {
               <div className="detail-row">
                 <span>Date & Time</span>
                 <span className="detail-value">
-                  {new Date(selectedEvent.date).toLocaleDateString()} at{" "}
-                  {selectedEvent.time}
+
                 </span>
               </div>
+
               <div className="detail-row">
                 <span>Venue</span>
                 <span className="detail-value">{selectedEvent.venue}</span>
               </div>
+
               <div className="detail-row">
                 <span>Location</span>
                 <span className="detail-value">{selectedEvent.location}</span>
@@ -749,6 +781,7 @@ const Events = () => {
                   {selectedEvent.totalCapacity}
                 </span>
               </div>
+
               <div className="detail-row total">
                 <span>Ticket Price</span>
                 <span className="detail-value">
@@ -757,12 +790,6 @@ const Events = () => {
               </div>
             </div>
 
-            <div className="qr-placeholder">
-              <div className="qr-code"></div>
-              <p className="qr-label">
-                QR Code will be generated after purchase
-              </p>
-            </div>
 
             <div className="modal-actions">
               <button
@@ -771,16 +798,19 @@ const Events = () => {
               >
                 Cancel
               </button>
+
               <button
                 className="modal-btn submit"
                 onClick={() => buyTicket(selectedEvent)}
               >
                 <Ticket size={18} /> Buy Ticket - ${selectedEvent.ticketPrice}
+
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 };
