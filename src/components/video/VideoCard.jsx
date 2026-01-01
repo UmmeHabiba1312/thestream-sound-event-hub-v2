@@ -38,10 +38,9 @@ const VideoCard = ({
     >
       <div className="video-thumbnail-wrapper" style={{ position: "relative" }}>
         <img
-          src={video.thumbnailUrl}
+          src={`${video.thumbnailUrl}?cb=${Date.now()}`} // Yeh add karo
           alt={video.title}
           className="video-thumbnail"
-          // Agar URL kharab ho ya image na milay toh placeholder dikhao
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = "/live_placeholder.png";

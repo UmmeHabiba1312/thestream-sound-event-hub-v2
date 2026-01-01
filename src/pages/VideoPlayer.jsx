@@ -699,6 +699,7 @@ const VideoPlayer = () => {
         .from("videos")
         .select("*, video_views(id)")
         .neq("id", videoId)
+        .or("approved.eq.true,category.eq.Live")
         .limit(5);
       if (recs) {
         setRecommendedVideos(

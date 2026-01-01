@@ -39,9 +39,13 @@ const EventCard = ({ event, onViewDetails }) => {
           </div>
           <div className="detail-item">
             <Users size={16} />
-            <span>
-              {event.availableTickets} / {event.totalCapacity} tickets
-            </span>
+            {event.isSoldOut ? (
+              <span className="sold-out-label">Sold Out</span>
+            ) : (
+              <span>
+                {event.availableTickets} / {event.totalCapacity} tickets
+              </span>
+            )}{" "}
           </div>
         </div>
 
