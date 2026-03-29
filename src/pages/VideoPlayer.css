@@ -1,541 +1,448 @@
-.video-player-page {
-  min-height: 100vh;
-  padding-top: 80px;
-  padding-bottom: 32px;
-  padding-left: 16px;
-  padding-right: 16px;
-  background: var(--bg-primary);
-}
-
-.video-player-container {
-  max-width: 1800px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-}
-
-@media (min-width: 1024px) {
-  .video-player-container {
-    grid-template-columns: 1fr 400px;
-  }
-}
-
-.video-player-main {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.video-player-wrapper {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: black;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow-elevated);
-}
-
-.video-player-placeholder {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.play-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.play-overlay:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.play-button-large {
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: white;
-  font-size: 30px;
-  background: var(--gradient-primary);
-  box-shadow: var(--shadow-glow);
-  transition: var(--transition);
-}
-
-.play-overlay:hover .play-button-large {
-  transform: scale(1.1);
-}
-
-.video-info-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.video-player-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.video-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.channel-info {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.channel-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--bg-secondary);
-}
-
-.channel-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.channel-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.channel-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.channel-subscribers {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.subscribe-button {
-  padding: 8px 24px;
-  border-radius: 9999px;
-  font-weight: 600;
-  color: white;
-  background: var(--gradient-primary);
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  border: none;
-  cursor: pointer;
-}
-
-.subscribe-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
-}
-
-.subscribe-button.subscribed {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-.video-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.action-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 9999px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  font-weight: 500;
-  transition: var(--transition);
-  cursor: pointer;
-}
-
-.action-button:hover {
-  border-color: var(--primary-color);
-  box-shadow: var(--shadow-glow);
-}
-
-.action-button.active {
-  color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.video-description-box {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.video-stats {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.video-description {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.comments-section {
-  margin-top: 24px;
-}
-
-.comments-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 24px;
-}
-
-.add-comment {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.comment-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--bg-secondary);
-  flex-shrink: 0;
-}
-
-.comment-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.comment-input-wrapper {
-  flex: 1;
-}
-
-.comment-input {
-  width: 100%;
-  background: transparent;
-  border-bottom: 2px solid var(--border-color);
-  padding: 8px;
-  color: var(--text-primary);
-  transition: var(--transition);
-}
+/* src/pages/VideoPlayer.css */
 
-.comment-input:focus {
-  outline: none;
-  border-bottom-color: var(--primary-color);
+.youtube-page {
+    display: flex;
+    background-color: #0f0f0f;
+    color: #fff;
+    min-height: 100vh;
+    padding: 24px;
+    gap: 24px;
 }
 
-.comment-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 8px;
+.youtube-main-content {
+    flex: 1;
+    max-width: 1280px;
 }
 
-.comment-cancel,
-.comment-submit {
-  padding: 8px 16px;
-  border-radius: 9999px;
-  font-weight: 500;
-  transition: var(--transition);
-  border: none;
-  cursor: pointer;
+.youtube-sidebar {
+    width: 400px;
+    flex-shrink: 0;
 }
-
-.comment-cancel {
-  color: var(--text-secondary);
-  background: transparent;
-}
-
-.comment-cancel:hover {
-  background: var(--bg-secondary);
-}
-
-.comment-submit {
-  color: white;
-  background: var(--gradient-primary);
-}
-
-.comment-submit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.comments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.comment-item {
-  display: flex;
-  gap: 16px;
-}
-
-.comment-content {
-  flex: 1;
-}
-
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.comment-author {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.comment-timestamp {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.comment-text {
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.comment-footer {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.comment-like,
-.comment-reply {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 14px;
-  color: var(--text-secondary);
-  transition: var(--transition);
-  cursor: pointer;
-  background: none;
-  border: none;
-}
-
-.comment-like:hover,
-.comment-reply:hover {
-  color: var(--text-primary);
-}
-
-.video-sidebar-recommendations {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.subscription-promo {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 24px;
-  text-align: center;
-  box-shadow: var(--shadow);
-}
-
-.promo-icon {
-  margin: 0 auto 16px;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary-color);
-  background: var(--gradient-primary);
-}
-
-.promo-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.promo-description {
-  color: var(--text-secondary);
-  margin-bottom: 16px;
-}
-
-.promo-button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  font-weight: 600;
-  color: white;
-  background: var(--gradient-primary);
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  border: none;
-  cursor: pointer;
-}
-
-.promo-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-elevated);
-}
-
-.recommendations-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-}
-
-.recommended-videos {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.recommended-video-card {
-  display: flex;
-  gap: 8px;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.recommended-video-card:hover .recommended-title {
-  color: var(--primary-color);
-}
-
-.recommended-thumbnail {
-  width: 160px;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-.recommended-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.recommended-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  transition: var(--transition);
-}
-
-.recommended-channel {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.recommended-stats {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.video-not-found {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  text-align: center;
-}
-
-.video-not-found h2 {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-}
-
-.video-not-found button {
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 600;
-  color: white;
-  background: var(--gradient-primary);
-  border: none;
-  cursor: pointer;
-}
-
-@media (max-width: 1024px) {
-  .video-player-container {
-    grid-template-columns: 1fr;
-  }
-
-  .video-sidebar-recommendations {
-    margin-top: 32px;
-  }
-
-  .recommended-videos {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-}
-
-@media (max-width: 768px) {
-  .video-player-title {
-    font-size: 20px;
-  }
-
-  .video-actions-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
 
-  .channel-info {
+/* Video Player */
+.youtube-video-wrapper {
+    position: relative;
     width: 100%;
-  }
+    padding-top: 56.25%; /* 16:9 */
+    background: black;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
 
-  .video-actions {
+.youtube-video-element {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.youtube-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* --- TOOLBAR: Channel + Actions --- */
+.youtube-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.youtube-channel-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.youtube-channel-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.channel-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.youtube-channel-name {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.youtube-subscribers {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.subscribe-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.youtube-subscribe-btn {
+    background: #f1f1f1;
+    color: #0f0f0f;
+    border: none;
+    padding: 0 16px;
+    height: 36px;
+    border-radius: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.youtube-subscribe-btn.subscribed {
+    background: #272727;
+    color: #f1f1f1;
+}
+
+.youtube-subscribe-btn:hover {
+    background: #d9d9d9;
+}
+.youtube-subscribe-btn.subscribed:hover {
+    background: #3f3f3f;
+}
+
+.youtube-bell-btn {
+    background: #272727;
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
     justify-content: center;
-  }
+}
 
-  .recommended-videos {
-    grid-template-columns: 1fr;
-  }
+/* --- ACTION BUTTONS (Right Side) --- */
+.youtube-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-  .recommended-thumbnail {
-    width: 128px;
-  }
+.tool-btn {
+    background: #272727;
+    color: white;
+    border: none;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.tool-btn:hover {
+    background: #3f3f3f;
+}
+
+/* Like/Dislike Group */
+.like-dislike-group {
+    display: flex;
+    align-items: center;
+    background: #272727;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.like-btn {
+    padding: 0 12px 0 16px;
+    background: transparent;
+}
+
+.dislike-btn {
+    padding: 0 16px 0 10px;
+    background: transparent;
+}
+
+.like-btn.active,
+.dislike-btn.active {
+    color: #3ea6ff; /* Active Blue Color */
+}
+
+.vertical-line {
+    width: 1px;
+    height: 24px;
+    background: #555;
+}
+
+/* Pill Buttons (Share, Clip etc) */
+.pill-btn {
+    padding: 0 16px;
+    border-radius: 18px;
+}
+
+.circle-btn {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* --- DESCRIPTION BOX --- */
+.youtube-description-box {
+    background: #272727;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.youtube-description-box:hover {
+    background: #3f3f3f;
+}
+
+.desc-header {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 10px;
+}
+
+.desc-text {
+    white-space: pre-wrap;
+    line-height: 1.4;
+}
+
+/* --- COMMENTS SECTION --- */
+.youtube-comments-section {
+    margin-top: 24px;
+}
+.youtube-comments-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.youtube-add-comment {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 30px;
+}
+.youtube-comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.youtube-comment-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #3f3f3f;
+    color: white;
+    padding: 4px 0;
+    font-size: 14px;
+}
+.youtube-comment-input:focus {
+    border-bottom: 2px solid white;
+    outline: none;
+}
+.youtube-comment-submit {
+    background: #3ea6ff;
+    color: black;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.youtube-comment-submit:disabled {
+    background: #272727;
+    color: #717171;
+}
+
+.youtube-comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.youtube-comment-item {
+    display: flex;
+    gap: 16px;
+}
+
+/* Comment Item Styles */
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+.youtube-comment-author {
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 5px;
+}
+.youtube-comment-time {
+    font-size: 12px;
+    color: #aaa;
+}
+.youtube-comment-text {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #f1f1f1;
+}
+
+/* Comment Actions */
+.comment-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+    align-items: center;
+}
+.action-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    padding: 6px 8px;
+    /* border-radius: 50%; */
+}
+.action-btn:hover {
+    background: #272727;
+    color: white;
+}
+.action-btn.active {
+    color: red;
+}
+
+/* Sidebar */
+.youtube-sidebar-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+.youtube-recommended-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+.youtube-recommended-thumb {
+    width: 168px;
+    height: 94px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+.youtube-recommended-title {
+    /* ... other styles ... */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Existing line */
+    line-clamp: 2; /* ADD THIS LINE to fix the warning */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+/* Menu CSS (Already provided previously) */
+.menu-container {
+    position: relative;
+}
+.menu-btn {
+    background: none;
+    border: none;
+    color: #f1f1f1;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.youtube-comment-item:hover .menu-btn {
+    opacity: 1;
+}
+.menu-btn:hover {
+    background: #272727;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: #282828;
+    border-radius: 8px;
+    padding: 8px 0;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    width: 120px;
+}
+.dropdown-menu button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+}
+.dropdown-menu button:hover {
+    background: #3f3f3f;
+}
+.live-status-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    z-index: 10;
+}
+.reply-input-box, .edit-box input{
+    border: none;
+    outline: none;
+   background: transparent;
+    border-bottom: 2px solid #aaa;
+    color: white;
+}
+.reply-buttons, .edit-actions{
+    margin-top: 10px;
+    margin-bottom: 12px;
+    display: flex;
+    gap:20px
+}
+.reply-buttons, .edit-actions .cancel-btn, .cancel-edit-btn{
+    /* background-color: #acacac; */
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 8px;
+}
+.reply-buttons, .edit-actions .cancel-btn:hover{
+    background-color: transparent;
+    color: white;
+    border: none;
+}
+.reply-buttons, .edit-actions .reply-btn, .save-edit-btn{
+/* background-color: #e72121; */
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 8px;
+}
+.reply-buttons .reply-btn:hover{
+background-color: #9b5252;
+    color: white;
 }
